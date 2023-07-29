@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 )
 
 func main() {
@@ -15,14 +16,14 @@ func main() {
 	// 	{4, 1, 8, 3},
 	// }
 	// fmt.Println(minimumTotal(triangle))
-	strs := []string{"11111", "100", "1101", "1101", "11000"}
+	strs := []string{"10", "0001", "111001", "1", "0"}
 	// nums := [][]int{
 	// 	{-1},
 	// 	{2},
 	// 	{3},
 	// }
 
-	fmt.Println(findMaxForm(strs, 5, 7))
+	fmt.Println(findMaxFormRecursiveApproach(strs, 5, 3))
 }
 
 /**
@@ -1314,4 +1315,36 @@ func countZerosOnesInString(strs string) (int, int) {
 		}
 	}
 	return countZero, countOne
+}
+
+func findMaxFormRecursiveApproach(strs []string, m int, n int) int {
+	fmt.Println("Given Array: ", strs, m, n)
+	var countValues = []int{}
+	fmt.Println(helper(strs, m, n, 0, &countValues), len(countValues))
+	return 0
+}
+
+func helper(strs []string, zero, one, index int, countValues *[]int) int {
+	*countValues = append(*countValues, 1)
+	var countStrZeroOnes = make([]int, 2)
+	if index == len(strs) || zero+one == 0 {
+		return 0
+	}
+	//fmt.Println(strings.Count(strs[index], "0"))
+	countStrZeroOnes[0] += strings.Count(strs[index], "0")
+	countStrZeroOnes[1] += (len(strs[index]) - countStrZeroOnes[0])
+
+	var accept, reject int
+	if zero >= countStrZeroOnes[0] && one >= countStrZeroOnes[1] {
+		accept = helper(strs, zero-countStrZeroOnes[0], one-countStrZeroOnes[1], index+1, countValues) + 1
+	} else {
+		// reject the string
+		reject = helper(strs, zero, one, index+1, countValues)
+	}
+
+	if reject > accept {
+		return reject
+	}
+
+	return accept
 }
