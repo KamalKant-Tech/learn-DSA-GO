@@ -1,7 +1,7 @@
 # learn-DSA-GO
 Learn data structure algorithms with go
 
-# Data Structures available in this Repo are:
+### Data Structures available in this Repo are:
 1.  Array
 2.  Heap
 3.  Priority Queue
@@ -9,7 +9,7 @@ Learn data structure algorithms with go
 5.  Tree
 6.  Maps
    
-# DSA Techniques to solve the problem:
+### DSA Techniques to Solve the Problem:
 1.  Two Pointers Approach
 2.  Heap Sorts
 3.  Quick Sort
