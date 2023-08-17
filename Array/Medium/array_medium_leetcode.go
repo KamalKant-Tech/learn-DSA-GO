@@ -16,14 +16,14 @@ func main() {
 	// 	{4, 1, 8, 3},
 	// }
 	// fmt.Println(minimumTotal(triangle))
-	strs := []string{"10", "0001", "111001", "1", "0"}
+	//strs := []string{"10", "0001", "111001", "1", "0"}
 	// nums := [][]int{
 	// 	{-1},
 	// 	{2},
 	// 	{3},
 	// }
-
-	fmt.Println(findMaxFormRecursiveApproach(strs, 5, 3))
+	//nums := []int{1, 3, 6, 7, 9, 4, 10, 5, 6}
+	//fmt.Println(lengthOfLIS(nums))
 }
 
 /**
@@ -1319,16 +1319,25 @@ func countZerosOnesInString(strs string) (int, int) {
 
 func findMaxFormRecursiveApproach(strs []string, m int, n int) int {
 	fmt.Println("Given Array: ", strs, m, n)
-	var countValues = []int{}
-	fmt.Println(helper(strs, m, n, 0, &countValues), len(countValues))
-	return 0
+	var storeZeroOneAtIndex = make([][][]int, m+1)
+	for i := 0; i < len(storeZeroOneAtIndex); i++ {
+		storeZeroOneAtIndex[i] = make([][]int, n+1)
+		for j := 0; j < len(storeZeroOneAtIndex[i]); j++ {
+			storeZeroOneAtIndex[i][j] = make([]int, len(strs))
+		}
+	}
+	return helper(strs, m, n, 0, storeZeroOneAtIndex)
 }
 
-func helper(strs []string, zero, one, index int, countValues *[]int) int {
-	*countValues = append(*countValues, 1)
+func helper(strs []string, zero, one, index int, storeZeroOneAtIndex [][][]int) int {
+	//*storeZeroOneAtIndex = append(*storeZeroOneAtIndex, 1)
 	var countStrZeroOnes = make([]int, 2)
 	if index == len(strs) || zero+one == 0 {
 		return 0
+	}
+
+	if storeZeroOneAtIndex[zero][one][index] > 0 {
+		return storeZeroOneAtIndex[zero][one][index]
 	}
 	//fmt.Println(strings.Count(strs[index], "0"))
 	countStrZeroOnes[0] += strings.Count(strs[index], "0")
@@ -1336,15 +1345,222 @@ func helper(strs []string, zero, one, index int, countValues *[]int) int {
 
 	var accept, reject int
 	if zero >= countStrZeroOnes[0] && one >= countStrZeroOnes[1] {
-		accept = helper(strs, zero-countStrZeroOnes[0], one-countStrZeroOnes[1], index+1, countValues) + 1
-	} else {
-		// reject the string
-		reject = helper(strs, zero, one, index+1, countValues)
+		accept = helper(strs, zero-countStrZeroOnes[0], one-countStrZeroOnes[1], index+1, storeZeroOneAtIndex) + 1
 	}
 
-	if reject > accept {
-		return reject
-	}
-
-	return accept
+	// reject the string
+	reject = helper(strs, zero, one, index+1, storeZeroOneAtIndex)
+	storeZeroOneAtIndex[zero][one][index] = int(math.Max(float64(reject), float64(accept)))
+	return storeZeroOneAtIndex[zero][one][index]
 }
+
+func max(x, y int) int {
+	if y > x {
+		return y
+	}
+	return x
+}
+
+func findMaxFormOptimalApproach(strs []string, m int, n int) int {
+	fmt.Println("Given Array:", strs, m, n)
+	var storeZeroOnemaxForm = [101][101]int{}
+	// for i := 0; i < len(storeZeroOnemaxForm); i++ {
+	// 	storeZeroOnemaxForm[i] = make([]int, n+1)
+	// }
+
+	for _, str := range strs {
+		countZero := strings.Count(str, "0")
+		countOne := (len(str) - countZero)
+		for zero := m; zero >= countZero; zero-- {
+			for one := n; one >= countOne; one-- {
+				storeZeroOnemaxForm[zero][one] = max(storeZeroOnemaxForm[zero][one], storeZeroOnemaxForm[zero-countZero][one-countOne]+1)
+			}
+		}
+	}
+	return storeZeroOnemaxForm[m][n]
+}
+
+/**
+* Problem: 712. Minimum ASCII Delete Sum for Two Strings
+* Given two strings s1 and s2, return the lowest ASCII sum of deleted characters to make two strings equal.
+* Input: s1 = "sea", s2 = "eat"
+* Output: 231
+* Explanation: Deleting "s" from "sea" adds the ASCII value of "s" (115) to the sum.
+* Deleting "t" from "eat" adds 116 to the sum.
+* At the end, both strings are equal, and 115 + 116 = 231 is the minimum sum possible to achieve this.
+ */
+func minimumDeleteSum(s1 string, s2 string) int {
+	//loop through both the string and get ascii char values for each character
+	// add the ascii char values for each char
+	fmt.Println("Here")
+	minSum := 0
+	tmpCount := 0
+	strTmp := ""
+	for i, str := range s1 {
+		strTmp = s1[i:]
+		if !strings.Contains(s2, string(str)) {
+			minSum += int(str)
+		} else if strings.Count(strTmp, string(str)) > strings.Count(s2, string(str)) {
+			minSum += int(str)
+		} else {
+			//fmt.Println(s1[i:])
+			if len([]rune(strTmp)) <= i {
+				strTmp = s1[i-1:]
+			}
+			if tmpCount < int(str) && strings.Replace(strTmp, string(str), "", 1) == strings.Replace(s2, string(str), "", 1) {
+				tmpCount = int(str)
+			}
+		}
+	}
+	for _, str := range s2 {
+		if !strings.Contains(s1, string(str)) {
+			minSum += int(str)
+		}
+	}
+	fmt.Println(tmpCount, minSum)
+	return minSum
+}
+
+// Compare string at the end
+func minimumDeleteSumBetterApproach(s1 string, s2 string) int {
+	m, n := len(s1), len(s2)
+
+	dp := make([][]int, m+1)
+	for i := 0; i <= m; i++ {
+		dp[i] = make([]int, n+1)
+	}
+
+	for i := m - 1; i >= 0; i-- {
+		dp[i][n] = dp[i+1][n] + int(s1[i])
+	}
+	for j := n - 1; j >= 0; j-- {
+		dp[m][j] = dp[m][j+1] + int(s2[j])
+	}
+	for i := m - 1; i >= 0; i-- {
+		for j := n - 1; j >= 0; j-- {
+			if s1[i] == s2[j] {
+				dp[i][j] = dp[i+1][j+1]
+			} else {
+				dp[i][j] = min(dp[i+1][j]+int(s1[i]), dp[i][j+1]+int(s2[j]))
+			}
+		}
+	}
+
+	return dp[0][0]
+}
+
+// Compare string at the start
+func minimumDeleteSumAnotherApproach(s1 string, s2 string) int {
+	m, n := len(s1), len(s2)
+
+	dp := make([][]int, m+1)
+	for i := 0; i <= m; i++ {
+		dp[i] = make([]int, n+1)
+	}
+
+	for i := 0; i < m; i++ {
+		dp[i+1][0] = dp[(i+1)-1][0] + int(s1[i])
+	}
+	for j := 0; j < n; j++ {
+		dp[0][j+1] = dp[0][(j+1)-1] + int(s2[j])
+	}
+
+	for i := 1; i <= m; i++ {
+		for j := 1; j <= n; j++ {
+			if s1[i-1] == s2[j-1] {
+				dp[i][j] = dp[i-1][j-1]
+			} else {
+				dp[i][j] = min(dp[i-1][j]+int(s1[i-1]), dp[i][j-1]+int(s2[j-1]))
+			}
+		}
+	}
+	return dp[m][n]
+}
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// Find min delete sum using recursive approach
+func minimumDeleteSumRecApproach(s1 string, s2 string) int {
+	return MinRec(s1, s2, len(s1), len(s2))
+}
+
+func MinRec(s1 string, s2 string, n, m int) int {
+	if m == 0 {
+		return getAtIndex(s1, n)
+	}
+	if n == 0 {
+		return getAtIndex(s2, m)
+	}
+	fmt.Println(string(s1[n-1]), string(s2[m-1]), n, m)
+	if s1[n-1] == s2[m-1] {
+		return MinRec(s1, s2, n-1, m-1)
+	} else {
+		//fmt.Println("Print S1 : ", int(s1[n-1]))
+		ans1 := int(s1[n-1]) + MinRec(s1, s2, n-1, m)
+		//fmt.Println("Print ans1 : ", ans1)
+		ans2 := int(s2[m-1]) + MinRec(s1, s2, n, m-1)
+		fmt.Println("Print ans1 : ", ans1)
+		fmt.Println("Print ans2 : ", ans2)
+		return min(ans1, ans2)
+	}
+}
+
+func getAtIndex(s string, idx int) int {
+	sum := 0
+	for i := 0; i < idx; i++ {
+		sum += int(s[i])
+	}
+	return sum
+}
+
+/**
+* Problem: 300. Longest Increasing Subsequence
+* Given an integer array nums, return the length of the longest strictly increasing subsequence
+* Input: nums = [10,9,2,5,3,7,101,18]
+* Output: 4
+* Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+ */
+
+// func lengthOfLIS(nums []int) int {
+// 	fmt.Println("Given Array: ", nums)
+// 	mapOfNums := make(map[int][]int)
+// 	trackElemCmp := make(map[int]bool)
+// 	totalLen := 0
+// 	i := 0
+// 	j := 1
+// 	if len(nums) == 1 {
+// 		return 1
+// 	}
+// 	for i < len(nums) && j < len(nums) {
+
+// 		if _, ok := mapOfNums[nums[i]]; !ok {
+// 			mapOfNums[nums[i]] = []int{nums[i]}
+// 		}
+
+// 		if nums[i] < nums[j] {
+// 			//fmt.Println(mapOfNums[nums[i]][len(mapOfNums[nums[i]])-1], nums[j], mapOfNums[nums[i]][len(mapOfNums[nums[i]])-1] < nums[j])
+// 			if len(mapOfNums[nums[i]]) > 0 && mapOfNums[nums[i]][len(mapOfNums[nums[i]])-1] < nums[j] {
+// 				mapOfNums[nums[i]] = append(mapOfNums[nums[i]], nums[j])
+// 			} else if !trackElemCmp[nums[i]] {
+// 				//fmt.Println(mapOfNums[nums[i]][:len(mapOfNums[nums[i]])])
+// 				mapOfNums[nums[i]] = append(mapOfNums[nums[i]][:len(mapOfNums[nums[i]])-1], nums[j])
+// 			}
+// 		}
+// 		if totalLen < len(mapOfNums[nums[i]]) {
+// 			totalLen = len(mapOfNums[nums[i]])
+// 		}
+// 		if j >= len(nums)-1 {
+// 			trackElemCmp[nums[i]] = true
+// 			i = i + 1
+// 			j = i + 1
+// 		} else {
+// 			j++
+// 		}
+// 	}
+// 	fmt.Println(mapOfNums)
+// 	return totalLen
+// }
