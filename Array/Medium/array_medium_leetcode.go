@@ -22,8 +22,8 @@ func main() {
 	// 	{2},
 	// 	{3},
 	// }
-	//nums := []int{1, 3, 6, 7, 9, 4, 10, 5, 6}
-	//fmt.Println(lengthOfLIS(nums))
+	nums := []int{3, 2, 1, 0, 4}
+	fmt.Println(canJump(nums))
 }
 
 /**
@@ -1564,3 +1564,32 @@ func getAtIndex(s string, idx int) int {
 // 	fmt.Println(mapOfNums)
 // 	return totalLen
 // }
+
+/**
+* 55. Jump Game
+* You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
+* Return true if you can reach the last index, or false otherwise.
+* Input: nums = [2,3,1,1,4]
+* Output: true
+* Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+ */
+
+func canJump(nums []int) bool {
+	arrLen := len(nums)
+	maxIndex := 0
+	if arrLen == 1 {
+		return true
+	}
+
+	for i := 0; i < arrLen-1 && maxIndex >= i; i++ {
+
+		if maxIndex < i+nums[i] {
+			maxIndex = i + nums[i]
+		}
+
+		if maxIndex >= arrLen-1 {
+			return true
+		}
+	}
+	return false
+}
