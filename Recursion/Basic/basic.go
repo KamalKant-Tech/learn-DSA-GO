@@ -3,7 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(SumOfNNumbersSolution(3))
+	//str := "kamal"
+	fmt.Println(fibonacciNumbers(4))
 }
 
 /**
@@ -73,4 +74,58 @@ func SumOfNNumbersSolution(n int) int {
 	}
 
 	return n + SumOfNNumbersSolution(n-1)
+}
+
+/** Reverse an array using recursion
+* Approach: Two Pointer
+ */
+
+func reverseArray(nums []int, start, end int) {
+	if start >= end {
+		return
+	}
+	nums[start], nums[end] = nums[end], nums[start]
+	reverseArray(nums, start+1, end-1)
+}
+
+/** Reverse an array using recursion
+* Approach: Using single pointer
+ */
+
+func reverseArraySinglePointer(nums []int, start int) {
+	n := len(nums)
+	if start >= n/2 {
+		return
+	}
+	nums[start], nums[n-start-1] = nums[n-start-1], nums[start]
+	reverseArraySinglePointer(nums, start+1)
+}
+
+/**
+* Check if a given string in pallindrome or not
+* Return true or false
+ */
+
+func isPallindrome(str string, i int) bool {
+	n := len(str)
+	if i >= n/2 {
+		return true
+	}
+
+	if str[i] != str[n-i-1] {
+		return false
+	}
+
+	return isPallindrome(str, i+1)
+}
+
+/** Multiple Recursion Calls
+* Point to remember: In multiple recursion calls, the first calls always finish first untill base condition then second recursive call happens.
+ */
+
+func fibonacciNumbers(n int) int {
+	if n <= 1 {
+		return n
+	}
+	return fibonacciNumbers(n-2) + fibonacciNumbers(n-1) // here is the multiple call for recursion
 }
