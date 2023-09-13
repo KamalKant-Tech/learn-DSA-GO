@@ -4,7 +4,9 @@ import "fmt"
 
 func main() {
 	//str := "kamal"
-	fmt.Println(fibonacciNumbers(4))
+	nums := []int{3, 1, 2}
+	arr := []int{}
+	printSubsequences(0, nums, arr)
 }
 
 /**
@@ -128,4 +130,25 @@ func fibonacciNumbers(n int) int {
 		return n
 	}
 	return fibonacciNumbers(n-2) + fibonacciNumbers(n-1) // here is the multiple call for recursion
+}
+
+/**
+* Print All the subsequences of an array
+* Approach: Recursive
+* Example: {3,1,2}
+ */
+
+func printSubsequences(i int, nums []int, arr []int) {
+	if i >= len(nums) {
+		fmt.Println(arr)
+		return
+	}
+
+	// Pick the element into the subsequences
+	arr = append(arr, nums[i])
+	printSubsequences(i+1, nums, arr)
+
+	// Not pick the element into subsequences
+	arr = append([]int{}, arr[:len(arr)-1]...)
+	printSubsequences(i+1, nums, arr)
 }
