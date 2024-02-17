@@ -6,6 +6,10 @@
 
 # For Eg:
     
-1.  Find the Minimum of somthing -> Min( of all stuffs)
+1.  Find the Minimum of something -> Min( of all stuffs)
 2.  Find the Maximum of something -> Max(of all stuffs)
     
+## LeetCode Problems:
+
+- [Problem 46 Permutations](Recursion/Intermediate/intermediate.go#381)
+- [Problem 47 Permutations II](Recursion/Intermediate/intermediate.go#446)
