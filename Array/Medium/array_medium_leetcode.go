@@ -22,8 +22,8 @@ func main() {
 	// 	{2},
 	// 	{3},
 	// }
-	nums := []int{3, 2, 1, 0, 4}
-	fmt.Println(canJump(nums))
+	nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
+	fmt.Println(subarraySumOptimal(nums, 14))
 }
 
 /**
@@ -1361,6 +1361,9 @@ func max(x, y int) int {
 	return x
 }
 
+/**
+* Using Dynamic Programming
+ */
 func findMaxFormOptimalApproach(strs []string, m int, n int) int {
 	fmt.Println("Given Array:", strs, m, n)
 	var storeZeroOnemaxForm = [101][101]int{}
@@ -1592,4 +1595,35 @@ func canJump(nums []int) bool {
 		}
 	}
 	return false
+}
+
+/**
+* 45. Jump Game II
+* You are given a 0-indexed array of integers nums of length n. You are initially positioned at nums[0].
+* Each element nums[i] represents the maximum length of a forward jump from index i. In other words, if you are at nums[i], you can jump to any nums[i + j] where:
+* 0 <= j <= nums[i] and i + j < n
+* Input: nums = [2,3,1,1,4]
+* Output: 2
+* Explanation: The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index.
+ */
+
+func jump(nums []int) int {
+	return jumpRecursive(nums, 0, len(nums)-1)
+}
+
+func jumpRecursive(nums []int, currentIndex, dest int) int {
+	if currentIndex >= dest {
+		return 0
+	}
+
+	tmpMinJump := math.MaxInt32
+
+	for i := 1; i <= nums[currentIndex]; i++ {
+		tmpJump := 1 + jumpRecursive(nums, currentIndex+i, dest)
+		if tmpMinJump > tmpJump {
+			tmpMinJump = tmpJump
+		}
+	}
+
+	return tmpMinJump
 }
