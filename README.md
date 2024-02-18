@@ -103,3 +103,5 @@ Learn data structure algorithms with go
 
 - [Problem: 46 Permutations](Recursion/Intermediate/intermediate.go#L381)
 - [Problem: 47 Permutations II](Recursion/Intermediate/intermediate.go#L446)
+- [Problem: 50. Pow(x, n) Brute Force](Recursion/Intermediate/intermediate.go#488)
+- [Problem: 50. Pow(x, n) Optimal](Recursion/Intermediate/intermediate.go#516)
