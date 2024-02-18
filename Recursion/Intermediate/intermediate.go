@@ -2,20 +2,22 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"sort"
 )
 
 func main() {
 	//nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
 	// nums1 := []int{10, 1, 2, 7, 6, 1, 5}
-	nums1 := []int{0, 1, 0, 0, 9}
+	// nums1 := []int{1, 1, 2}
 	// n := 8
 	// m := 3
 	// nums2 := []int{2, 5, 6}
 	// n := 3
 	// ans := []int{}
 
-	fmt.Println(permuteUnique(nums1))
+	// fmt.Println(permuteUnique(nums1))
+	fmt.Println(myPow(0.44528, 0))
 }
 
 /** Print the all subsequences whose sum equal to k
@@ -474,4 +476,56 @@ func PermutationsUnique(nums []int, ans *[][]int, used map[int]bool, track []int
 		track = track[:len(track)-1]
 		used[i] = false
 	}
+}
+
+/**
+* Problem: 50. Pow(x, n)
+* Implement pow(x, n), which calculates x raised to the power n (i.e., x^n).
+* Input: x = 2.00000, n = 10
+* Output: 1024.00000
+ */
+
+func myPow(x float64, n int) float64 {
+	var powerSum float64
+	var isNegative bool
+	if n < 0 {
+		isNegative = true
+		n = int(math.Abs(float64(n)))
+	}
+	if n == 0 {
+		return 1
+	}
+	for i := 0; i < n; i++ {
+		if powerSum > 0 {
+			powerSum *= x
+		} else if powerSum < 0 {
+			powerSum *= x
+		} else {
+			powerSum = x
+		}
+
+	}
+
+	if isNegative {
+		powerSum = 1 / powerSum
+	}
+
+	return powerSum
+}
+
+func myPowOptimalSolution(x float64, n int) float64 {
+	if n == 0 {
+		return 1
+	}
+
+	if n < 0 {
+		x = 1 / x
+		n = -n
+	}
+
+	half := myPow(x, n/2)
+	if n%2 == 0 {
+		return half * half
+	}
+	return half * half * x
 }
