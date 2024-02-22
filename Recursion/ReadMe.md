@@ -11,7 +11,8 @@
     
 ## LeetCode Problems:
 
-- [Problem 46 Permutations](Recursion/Intermediate/intermediate.go#381)
-- [Problem 47 Permutations II](Recursion/Intermediate/intermediate.go#446)
-- [Problem: 50. Pow(x, n) Brute Force](Recursion/Intermediate/intermediate.go#488)
-- [Problem: 50. Pow(x, n) Optimal](Recursion/Intermediate/intermediate.go#516)
+- [Problem 46 Permutations](Recursion/Intermediate/intermediate.go#L381)
+- [Problem 47 Permutations II](Recursion/Intermediate/intermediate.go#L446)
+- [Problem: 50. Pow(x, n) Brute Force](Recursion/Intermediate/intermediate.go#L488)
+- [Problem: 50. Pow(x, n) Optimal](Recursion/Intermediate/intermediate.go#L516)
+- [Binary Search Using Recursion](Recursion/Intermediate/intermediate.go#L573)
