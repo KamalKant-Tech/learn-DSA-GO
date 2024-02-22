@@ -9,7 +9,7 @@ import (
 func main() {
 	//nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
 	// nums1 := []int{10, 1, 2, 7, 6, 1, 5}
-	// nums1 := []int{1, 1, 2}
+	nums1 := []int{1, 2, 3, 5, 6, 7}
 	// n := 8
 	// m := 3
 	// nums2 := []int{2, 5, 6}
@@ -17,7 +17,7 @@ func main() {
 	// ans := []int{}
 
 	// fmt.Println(permuteUnique(nums1))
-	fmt.Println(myPow(0.44528, 0))
+	fmt.Println(BinarySearchRecursive(nums1, 5, 0, len(nums1)-1))
 }
 
 /** Print the all subsequences whose sum equal to k
@@ -523,9 +523,67 @@ func myPowOptimalSolution(x float64, n int) float64 {
 		n = -n
 	}
 
-	half := myPow(x, n/2)
+	half := myPowOptimalSolution(x, n/2)
 	if n%2 == 0 {
 		return half * half
 	}
 	return half * half * x
+}
+
+// Binary Search Using Recurssion
+
+func BinarySearch(nums []int, n, startInd, EndInd int) bool {
+	// length := len(nums)
+	fmt.Println("Given Array", nums, startInd, EndInd)
+	half := (startInd + EndInd) / 2
+	fmt.Println(half, len(nums), EndInd)
+	if half == 0 {
+		return false
+	}
+	if nums[half] > n {
+		EndInd = half
+	} else {
+		startInd = half
+	}
+	if startInd >= len(nums) || startInd >= EndInd {
+		return false
+	}
+
+	if nums[startInd] == n || nums[EndInd] == n {
+		return true
+	} else {
+		startInd++
+		EndInd--
+	}
+
+	// if nums[EndInd] < n {
+	// 	return false
+	// }
+
+	// if startInd+1 == EndInd {
+	// 	return false
+	// }
+
+	return BinarySearch(nums, n, startInd, EndInd)
+}
+
+// binarySearchRecursive searches for the target value in the sorted slice arr
+// recursively. It returns the index of the target in the slice if found,
+// otherwise returns -1.
+func BinarySearchRecursive(nums []int, target, startIndex, endIndex int) int {
+	if startIndex > endIndex {
+		return -1
+	}
+
+	mid := (startIndex + endIndex) / 2
+
+	if nums[mid] == target {
+		return mid
+	} else if nums[mid] < target {
+		startIndex = mid + 1
+		return BinarySearchRecursive(nums, target, startIndex, endIndex)
+	} else {
+		endIndex = mid - 1
+		return BinarySearchRecursive(nums, target, startIndex, endIndex)
+	}
 }
