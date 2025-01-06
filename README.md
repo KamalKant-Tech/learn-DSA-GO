@@ -72,6 +72,21 @@ Learn data structure algorithms with go
 - [Problem: Leaders in array problem(Brute Force)](Array/Medium/array_medium_leetcode.go#L418)
 - [Problem: Leaders in array problem(Better)](Array/Medium/array_medium_leetcode.go#L445)
 - [Problem: 128. Longest Consecutive Sequence(Brute Force)](Array/Medium/array_medium_leetcode.go#L467)
+- [Problem: 139. Word Break](Array/Medium/array_medium_leetcode.go#L1898)
+- [Problem: 139. Word Break(Optimal)](Array/Medium/array_medium_leetcode.go#L1946)
+- [Problem: 907. Sum of Subarray Minimums(Brute Force)](Array/Medium/array_medium_leetcode.go#L1779)
+- [Problem: 907. Sum of Subarray Minimums(Optimal)](Array/Medium/array_medium_leetcode.go#L1816)
+- [Problem: 49. Group Anagrams(Brute Force Using Sorting)](Array/Medium/array_medium_leetcode.go#L1697)
+- [Problem: 49. Group Anagrams(Optimal Using HashMap)](Array/Medium/array_medium_leetcode.go#L1715)
+- [Problem: 17. Letter Combinations of a Phone Number)](Array/Medium/array_medium_leetcode.go#L1640)
+
+### Hard: LeetCode Problems
+- [Problem: 51. N-Queens](Recursion/Hard/hard.go#L23)
+- [Problem: 52. N-Queens II](Recursion/Hard/hard.go#L145)
+- [Problem: 906. Super Palindromes](Array/Medium/main.go#L63)
+- [Problem: 41. First Missing Positives](Array/Medium/main.go#L161)
+- [Problem: Problem: 30. Substring with Concatenation of All Words](Array/Medium/main.go#L226)
+- [Problem: Problem: 30. Substring with Concatenation of All Words(Optimal)](Array/Medium/main.go#L286)
 
 ## Heap
 
@@ -106,6 +121,8 @@ Learn data structure algorithms with go
 - [Problem: 50. Pow(x, n) Brute Force](Recursion/Intermediate/intermediate.go#L488)
 - [Problem: 50. Pow(x, n) Optimal](Recursion/Intermediate/intermediate.go#L516)
 - [Binary Search Using Recursion](Recursion/Intermediate/intermediate.go#L573)
+- [Problem: 139. Word Break](Array/Medium/array_medium_leetcode.go#L1898)
+- [Problem: 17. Letter Combinations of a Phone Number)](Array/Medium/array_medium_leetcode.go#L1640)
 
 ### Hard: LeetCode Problems:
 - [Problem: 51. N-Queens](Recursion/Hard/hard.go#L23)
