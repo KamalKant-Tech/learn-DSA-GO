@@ -22,8 +22,16 @@ func main() {
 	// 	{2},
 	// 	{3},
 	// }
-	nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
-	fmt.Println(subarraySumOptimal(nums, 14))
+	// nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
+	// fmt.Println(letterCombinations("234"))
+	// strs := []string{"eat", "tea", "tan", "ate", "nat", "bat"}
+	// // fmt.Println(groupAnagrams(strs))
+	// fmt.Println(groupAnagramsUsingHashMap(strs))
+	// fmt.Println(checkTwoStringAnnagram("eat", "tea"))
+	// fmt.Println(sumSubarrayMins([]int{3, 1, 2, 4}))
+	s := "aaaaab"
+	wordDict := []string{"a", "aa", "aaa", "aaaa", "aaaaa"}
+	fmt.Println(wordBreak(s, wordDict))
 }
 
 /**
@@ -1627,3 +1635,377 @@ func jumpRecursive(nums []int, currentIndex, dest int) int {
 
 	return tmpMinJump
 }
+
+/**
+* Problem: 17. Letter Combinations of a Phone Number
+* Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
+* A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+* Image: https://assets.leetcode.com/uploads/2022/03/15/1200px-telephone-keypad2svg.png
+* Example:
+* Input: digits = "23"
+* Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+ */
+func letterCombinations(digits string) []string {
+	var result []string
+	phoneMap := map[string][]string{
+		"2": {"a", "b", "c"},
+		"3": {"d", "e", "f"},
+		"4": {"g", "h", "i"},
+		"5": {"j", "k", "l"},
+		"6": {"m", "n", "o"},
+		"7": {"p", "q", "r", "s"},
+		"8": {"t", "u", "v"},
+		"9": {"w", "x", "y", "z"},
+	}
+	if len(digits) == 0 {
+		return result
+	}
+	var backtrack func(string, string)
+	backtrack = func(combination string, nextDigits string) {
+		if len(nextDigits) == 0 {
+			result = append(result, combination)
+		} else {
+			for _, letter := range phoneMap[string(nextDigits[0])] {
+				backtrack(combination+letter, nextDigits[1:])
+			}
+		}
+	}
+	backtrack("", digits)
+	return result
+}
+
+func sortString(str string) string {
+	s := strings.Split(str, "")
+	sort.Strings(s)
+	return strings.Join(s, "")
+}
+
+/*
+*
+* Problem: 49. Group Anagrams
+* Given an array of strings strs, group the anagrams together. You can return the answer in any order.
+* A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+* Image: https://assets.leetcode.com/uploads/2022/03/15/1200px-telephone-keypad2svg.png
+* Example:
+* Input: strs = ["eat","tea","tan","ate","nat","bat"]
+* Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+* Explanation:
+  - There is no string in strs that can be rearranged to form "bat".
+  - The strings "nat" and "tan" are anagrams as they can be rearranged to form each other.
+  - The strings "ate", "eat", and "tea" are anagrams as they can be rearranged to form each other.
+*/
+func groupAnagrams(strs []string) [][]string {
+	fmt.Println("Given Array: ", strs)
+	anagramMap := make(map[string][]string)
+	for _, str := range strs {
+		sortedStr := sortString(str)
+		fmt.Println("Sorted string: ", str, sortedStr)
+		anagramMap[sortedStr] = append(anagramMap[sortedStr], str)
+	}
+	fmt.Println(anagramMap)
+	result := [][]string{}
+	for _, anagrams := range anagramMap {
+		result = append(result, anagrams)
+	}
+	return result
+}
+
+// another solution using hashmap
+
+func groupAnagramsUsingHashMap(strs []string) [][]string {
+	mp := map[[26]int][]string{}
+	for _, s := range strs {
+		k := [26]int{}
+		for i := 0; i < len(s); i++ {
+			k[s[i]-'a'] += 1
+		}
+		// fmt.Println(k, s)
+		mp[k] = append(mp[k], s)
+	}
+	fmt.Println(mp)
+	res := [][]string{}
+	for _, v := range mp {
+		res = append(res, v)
+	}
+	return res
+}
+
+// checkTwoStringAnnagram checks if two strings are anagrams of each other.
+// An anagram is a word or phrase formed by rearranging the letters of a different word or phrase,
+// typically using all the original letters exactly once.
+//
+// Parameters:
+//   - s: The first string to be checked.
+//   - t: The second string to be checked.
+//
+// Input: s = "anagram", t = "nagaram"
+// Output: true
+// Returns: bool
+func checkTwoStringAnnagram(s string, t string) bool {
+	if len(s) != len(t) {
+		fmt.Println("The strings are not anagrams of each other.")
+		return false
+	}
+
+	sMap := make(map[rune]int)
+	tMap := make(map[rune]int)
+	for _, v := range s {
+		sMap[v]++
+	}
+	for _, v := range t {
+		tMap[v]++
+	}
+	for k, v := range sMap {
+		if tMap[k] != v {
+			fmt.Println("The strings are not anagrams of each other.")
+			return false
+		}
+	}
+	fmt.Println("The strings are anagrams of each other.")
+	return true
+}
+
+/**
+* Problem: 907. Sum of Subarray Minimums
+* Given an array of integers arr, find the sum of min(b), where b ranges over every (contiguous) subarray of arr. Since the answer may be large, return the answer modulo 10^9 + 7
+* Input: arr = [3,1,2,4]
+* Output: 17
+* Explanation:
+* Subarrays are [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4].
+* Minimums are 3, 1, 2, 4, 1, 1, 2, 1, 1, 1.
+* Sum is 17.
+ */
+
+func sumSubarrayMinsBruteForce(arr []int) int {
+	const mod = 1e9 + 7
+	// result := [][]int{}
+	// 0, 0,0 | 0,1 | 0,2 | 0,3 => [[3], [3,1], [3,1,2], [3,1,2,4]]
+	// 1, 1,1 | 1,2,| 1,3 => [[1], [1,2], [1,2,4]]
+	// 2, 2,2 | 2,3 => [[2], [2,4]]
+	// 3, 3,3 => [[4]]
+	minSum := 0
+	for i := range arr {
+		minimum := math.MaxInt64
+		if i == 0 {
+			fmt.Println(minimum)
+		}
+		for j := i + 1; j <= len(arr); j++ {
+			// result = append(result, arr[i:j])
+			tmpArr := arr[i:j]
+			if len(tmpArr) > 1 {
+
+				for k := 0; k < len(tmpArr); k++ {
+					if tmpArr[k] < minimum {
+						minimum = tmpArr[k]
+					}
+				}
+				minSum += minimum
+			} else {
+				minSum += tmpArr[0]
+			}
+		}
+		// fmt.Println(minSum)
+		// fmt.Println(arr)
+		// minSum += arr[i]
+	}
+
+	// fmt.Println(result, minSum)
+	return minSum % int(mod)
+}
+
+func sumSubarrayMins(arr []int) int {
+
+	// mod is a constant used for taking the result modulo (10^9 + 7).
+	// n is the length of the input array arr.
+	// stack is used to keep track of indices while processing the array.
+	// prev and next arrays are used to store the distances to the previous and next smaller elements for each element in arr.
+
+	const mod = 1e9 + 7
+	n := len(arr)
+	stack := []int{}
+	prev := make([]int, n)
+	next := make([]int, n)
+
+	// Initialize prev and next arrays. Initially, prev[i] is set to i + 1 and next[i] is set to n - i.
+	for i := 0; i < n; i++ {
+		prev[i] = i + 1
+		next[i] = n - i
+	}
+
+	// This loop calculates the prev array. For each element arr[i], it finds the distance to the previous smaller element.
+	// If the stack is not empty and the top element of the stack is greater than arr[i], pop the stack.
+	// If the stack is not empty after popping, set prev[i] to the distance between i and the top element of the stack.
+	// If the stack is empty, set prev[i] to i + 1.
+	// Push the current index i onto the stack.
+
+	for i := 0; i < n; i++ {
+		for len(stack) > 0 && arr[stack[len(stack)-1]] > arr[i] {
+			stack = stack[:len(stack)-1]
+		}
+		if len(stack) > 0 {
+			prev[i] = i - stack[len(stack)-1]
+		} else {
+			prev[i] = i + 1
+		}
+		stack = append(stack, i)
+	}
+
+	// This loop calculates the next array. For each element arr[i], it finds the distance to the next smaller element.
+	// If the stack is not empty and the top element of the stack is greater than or equal to arr[i], pop the stack.
+	// If the stack is not empty after popping, set next[i] to the distance between the top element of the stack and i.
+	// If the stack is empty, set next[i] to n - i.
+	// Push the current index i onto the stack.
+
+	stack = []int{}
+	for i := n - 1; i >= 0; i-- {
+		for len(stack) > 0 && arr[stack[len(stack)-1]] >= arr[i] {
+			stack = stack[:len(stack)-1]
+		}
+		if len(stack) > 0 {
+			next[i] = stack[len(stack)-1] - i
+		} else {
+			next[i] = n - i
+		}
+		stack = append(stack, i)
+	}
+
+	// Initialize result to 0.
+	// For each element arr[i], add the product of arr[i], prev[i], and next[i] to result, taking modulo (10^9 + 7).
+	result := 0
+	for i := 0; i < n; i++ {
+		result = (result + arr[i]*prev[i]*next[i]) % int(mod)
+	}
+
+	return result
+}
+
+/*
+*
+* Problem: 139. Word Break
+* Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.
+* Note that the same word in the dictionary may be reused multiple times in the segmentation.
+* Example:
+* Input: s = "leetcode", wordDict = ["leet","code"]
+* Output: true
+* Explanation: Return true because "leetcode" can be segmented as "leet code".
+
+* Input: s = "applepenapple", wordDict = ["apple","pen"]
+* Output: truex
+
+* Input: s = "catsandog", wordDict = ["cats","dog","sand","and","cat"]
+* Output: false
+ */
+func wordBreak(s string, wordDict []string) bool {
+	fmt.Println("Given Array: ", s, wordDict)
+	wordSet := make(map[string]bool)
+	for _, word := range wordDict {
+		wordSet[word] = true
+	}
+	return wordBreakRecursive(s, wordSet, 0, make(map[int]bool))
+}
+
+func wordBreakRecursive(s string, wordSet map[string]bool, start int, memo map[int]bool) bool {
+	if start == len(s) {
+		return true
+	}
+	// fmt.Println(memo)
+	if val, exists := memo[start]; exists {
+		return val
+	}
+	// start = 0, end = 1 to 8
+	// 0,1 | 0,2 | 0,3 | 0,4 | 0,5 | 0,6 | 0,7 | 0,8
+	// start = 1, end = 2 to 8
+	// 1,2 | 1,3 | 1,4 | 1,5 | 1,6 | 1,7 | 1,8
+	// start = 2, end = 3 to 8
+	// 2,3 | 2,4 | 2,5 | 2,6 | 2,7 | 2,8
+	// start = 3, end = 4 to 8
+	// 3,4 | 3,5 | 3,6 | 3,7 | 3,8
+	// start = 4, end = 5 to 8
+	// 4,5 | 4,6 | 4,7 | 4,8
+	// start = 5, end = 6 to 8
+	// 5,6 | 5,7 | 5,8
+	// start = 6, end = 7 to 8
+	// 6,7 | 6,8
+	// start =7, end = 8 to 8
+	// 7,8
+
+	// wordBreakRecursive(0)
+	// wordBreakRecursive(1)
+	for end := start + 1; end <= len(s); end++ {
+		fmt.Println(start, end, wordSet[s[start:end]])
+		if wordSet[s[start:end]] && wordBreakRecursive(s, wordSet, end, memo) {
+			fmt.Println("String: ", s[start:end])
+			memo[start] = true
+			return true
+		}
+	}
+	memo[start] = false
+	return false
+}
+
+func wordBreakOptimal(s string, wordDict []string) bool {
+	wordSet := make(map[string]bool)
+	for _, word := range wordDict {
+		wordSet[word] = true
+	}
+	dp := make([]bool, len(s)+1)
+	dp[0] = true
+	for i := 1; i <= len(s); i++ {
+		for j := 0; j < i; j++ {
+			if dp[j] && wordSet[s[j:i]] {
+				dp[i] = true
+				break
+			}
+		}
+	}
+	return dp[len(s)]
+}
+
+// func wordBreak(s string, wordDict []string) bool {
+// 	fmt.Println("Given Array: ", s, wordDict)
+// 	// cats -> index 0 + 4 = 4
+// 	// dog -> index 6 =  4 + 3 = 7
+// 	// dog -> index 3 + 3 = 7 + 3 = 10
+// 	start := 0
+// 	end := 0
+// 	// 2D array to store the result of the word break
+// 	dp := make([][]bool, len(s))
+// 	for i := 0; i < len(s); i++ {
+// 		dp[i] = make([]bool, len(s))
+// 	}
+// 	return isWordBreak(s, wordDict, start, end, &dp)
+// }
+
+// func isWordBreak(s string, wordDict []string, start, end int, dp *[][]bool) bool {
+// 	if end == len(s) {
+// 		return true
+// 	}
+
+// 	if (*dp)[start][end] {
+// 		(*dp)[start][end] = true
+// 		return (*dp)[start][end]
+// 	}
+
+// 	if isWordDictContains(wordDict, s[start:end+1]) && isWordBreak(s, wordDict, end+1, end+1, dp) {
+// 		(*dp)[start][end] = true
+// 		return true
+// 	}
+
+// 	if isWordBreak(s, wordDict, start, end+1, dp) {
+// 		(*dp)[start][end] = true
+// 		return true
+// 	}
+
+// 	(*dp)[start][end] = false
+// 	return (*dp)[start][end]
+// }
+
+// func isWordDictContains(wordDict []string, word string) bool {
+// 	for _, v := range wordDict {
+// 		if v == word {
+// 			return true
+// 		}
+// 	}
+// 	return false
+
+// }

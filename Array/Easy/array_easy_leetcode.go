@@ -35,15 +35,18 @@ func main() {
 	// nums2 := []int{2, 5, 6}
 	// n := 3
 	// mergeTwoSortedArray(nums1, m, nums2, n)
-	arr1 := []int{1, -2147483648, 2}
+	// arr1 := []int{1, -2147483648, 2}
 	// arr2 := []int{2, 3, 3, 5, 6, 6, 7}
 	// MergeSort(arr)
 	// fmt.Println(twoSum([]int{2, 7, 11, 15}, 9))
 	// sortColors(arr1)
 	// fmt.Println()
-	fmt.Println(thirdMax(arr1))
+	// fmt.Println(thirdMax(arr1))
 	//fmt.Println()
 	// fmt.Println(dominantIndex([]int{1, 2, 3, 4}))
+	// superpalindromesInRange("4", "1000")
+
+	rotateString("abcde", "cdeab")
 }
 
 // Continuous Subarray Sum
@@ -1204,4 +1207,211 @@ func thirdMax(nums []int) int {
 	}
 
 	return thirdMax
+}
+
+/**
+* 1572. Matrix Diagonal Sum
+* Given a square matrix mat, return the sum of the matrix diagonals.
+* Only include the sum of all the elements on the primary diagonal and all the elements on the secondary diagonal that are not part of the primary diagonal.
+* Input: mat = [
+	[1,2,3],
+    [4,5,6],
+    [7,8,9]
+]
+* Output: 25
+* Explanation: Diagonals sum: 1 + 5 + 9 + 3 + 7 = 25
+ * Notice that element mat[1][1] = 5 is counted only once.
+*/
+
+func diagonalSumBruteForce(mat [][]int) int {
+	// Get the sum for left to right diagonal
+	lrSum := 0
+	for row := 0; row < len(mat); row++ {
+		for col := row; col < row+1; col++ {
+			lrSum += mat[row][col]
+		}
+	}
+	rlSum := 0
+	// Get the sum for right to left diagonal
+	for row := 0; row < len(mat); row++ {
+		for col := len(mat) - 1 - row; col >= len(mat)-1-row; col-- {
+			if row == col {
+				continue
+			}
+			rlSum += mat[row][col]
+		}
+	}
+
+	return lrSum + rlSum
+}
+
+func diagonalSumBetter(mat [][]int) int {
+	n := len(mat)
+	// Get the sum for left to right diagonal
+	sum := 0
+	for row := 0; row < len(mat); row++ {
+		for col := row; col < row+1; col++ {
+			sum += mat[row][col]
+			if row == n-1-col {
+				continue
+			}
+			sum += mat[row][n-1-col]
+		}
+	}
+	return sum
+}
+
+/** Problem: 2319. Check if Matrix Is X-Matrix
+* A square matrix is said to be an X-Matrix if both of the following conditions hold:
+* 1. All the elements in the diagonals of the matrix are non-zero.
+* 2. All other elements are 0.
+* Given a 2D integer array grid of size n x n representing a square matrix, return true if grid is an X-Matrix. Otherwise, return false.
+ */
+
+func checkXMatrix(grid [][]int) bool {
+	n := len(grid)
+	for row := 0; row < len(grid); row++ {
+		for col := 0; col < len(grid[0]); col++ {
+			if (row == col || row == n-1-col) && grid[row][col] == 0 {
+				return false
+			}
+
+			if (row != col && row != n-1-col) && grid[row][col] != 0 {
+				return false
+			}
+
+		}
+	}
+	return true
+}
+
+/*
+*
+* Problem: 905. Sort Array By Parity
+* Given an integer array nums, move all the even integers at the beginning of the array followed by all the odd integers.
+* Return any array that satisfies this condition.
+*
+// Example:
+// Input: [3, 1, 2, 4]
+// Explanation: The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
+*/
+
+func sortArrayByParity(nums []int) []int {
+	start, end := 0, len(nums)-1
+
+	for start < end {
+		if nums[start]%2 == 0 {
+			start++
+			continue
+		}
+
+		if nums[end]%2 == 1 {
+			end--
+			continue
+		}
+
+		nums[start], nums[end] = nums[end], nums[start]
+		start++
+		end--
+	}
+
+	return nums
+}
+
+/*
+*
+* Problem: 205. Isomorphic Strings
+* Given two strings s and t, determine if they are isomorphic.
+* Two strings s and t are isomorphic if the characters in s can be replaced to get t.
+* All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character, but a character may map to itself.
+*
+// Example:
+// Input: s = "egg", t = "add"
+// Explanation: The strings s and t can be made identical by:
+	* Mapping 'e' to 'a'.
+	* Mapping 'g' to 'd'.
+* Apprach:
+* Here's a step-by-step explanation of the solution:
+
+	Length Check:
+
+	The function first checks if the lengths of s and t are different. If they are, the strings cannot be isomorphic, so it returns false.
+	Mapping Initialization:
+
+	Two maps (mapST and mapTS) are created to store the character mappings from s to t and from t to s, respectively.
+	Character Mapping:
+
+	The function iterates through each character of the strings s and t simultaneously.
+	For each character pair (charS from s and charT from t):
+	It checks if charS is already mapped to a different character in mapST. If so, it returns false.
+	If charS is not mapped yet, it adds the mapping charS -> charT to mapST.
+	Similarly, it checks if charT is already mapped to a different character in mapTS. If so, it returns false.
+	If charT is not mapped yet, it adds the mapping charT -> charS to mapTS.
+	Return True:
+
+	If no conflicting mappings are found during the iteration, the function returns true, indicating that the strings are isomorphic.
+	This approach ensures that each character in s maps to exactly one character in t and vice versa, maintaining the isomorphic property.
+
+	Here's the code again for reference:
+
+
+*/
+
+func isIsomorphic(s string, t string) bool {
+	if len(s) != len(t) {
+		return false
+	}
+
+	// Create two maps to store the character mappings
+	mapST := make(map[byte]byte)
+	mapTS := make(map[byte]byte)
+
+	for i := 0; i < len(s); i++ {
+		charS := s[i]
+		charT := t[i]
+
+		// Check if there is a conflicting mapping in mapST
+		if val, ok := mapST[charS]; ok {
+			if val != charT {
+				return false
+			}
+		} else {
+			mapST[charS] = charT
+		}
+
+		// Check if there is a conflicting mapping in mapTS
+		if val, ok := mapTS[charT]; ok {
+			if val != charS {
+				return false
+			}
+		} else {
+			mapTS[charT] = charS
+		}
+	}
+
+	return true
+}
+
+/**
+* 796. Rotate String
+* Given two strings s and goal, return true if and only if s can become goal after some number of shifts on s.
+* A shift on s consists of moving the leftmost character of s to the rightmost position.
+* For example, if s = "abcde", then it will be "bcdea" after one shift.
+* Input: s = "abcde", goal = "cdeab"
+* Output: true
+ */
+
+func rotateString(s string, goal string) bool {
+
+	if len(s) != len(goal) {
+		return false
+	}
+
+	for i := 0; i < len(s); i++ {
+		fmt.Println(s[i:], goal[:len(s)-i], s[:i], goal[len(s)-i:])
+		if s[i:] == goal[:len(s)-i] && s[:i] == goal[len(s)-i:] {
+			return true
+		}
+	}
+	return false
 }

@@ -7,17 +7,38 @@ import (
 )
 
 func main() {
-	//nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
+	// nums := []int{1, 2, 4, 8, 9, -2, -7, 3}
 	// nums1 := []int{10, 1, 2, 7, 6, 1, 5}
-	nums1 := []int{1, 2, 3, 5, 6, 7}
-	// n := 8
-	// m := 3
-	// nums2 := []int{2, 5, 6}
-	// n := 3
-	// ans := []int{}
+	// nums1 := []int{1, 2, 3, 5, 6, 7}
+	// // n := 8
+	// // m := 3
+	// // nums2 := []int{2, 5, 6}
+	// // n := 3
+	// // ans := []int{}
 
-	// fmt.Println(permuteUnique(nums1))
-	fmt.Println(BinarySearchRecursive(nums1, 5, 0, len(nums1)-1))
+	// // fmt.Println(permuteUnique(nums1))
+	// fmt.Println(BinarySearchRecursive(nums1, 5, 0, len(nums1)-1))
+
+	// matrix := [][]byte{
+	// 	{5, 3, '.', '.', 7, '.', '.', '.', '.'},
+	// 	{6, '.', '.', 1, 9, 5, '.', '.', '.'},
+	// 	{'.', 9, 8, '.', '.', '.', '.', 6, '.'},
+	// 	{8, '.', '.', '.', 6, '.' ,'.', '.', 3},
+	// 	{4, '.', '.', 8, '.', 3, '.', '.', 1},
+	// 	{7, '.', '.', '.', 2, '.', '.', '.', 6},
+	// 	{'.', 6, '.', '.', '.', '.', 2, 8, '.'},
+	// 	{'.', '.', '.', 4, 1, 9, '.', '.', 5},
+	// 	{'.', '.', '.', '.', 8, '.', '.', 7, 9},
+	// }
+	// fmt.Println(isValidSudoku(matrix))
+
+	// box := [][]string{
+	// 	{"#", "#", "*", ".", "*", "."},
+	// 	{"#", "#", "#", "*", ".", "."},
+	// 	{"#", "#", "#", ".", "#", "."},
+	// }
+	box := [][]byte{{'#', '.', '#'}}
+	fmt.Println(rotateTheBoxs(box))
 }
 
 /** Print the all subsequences whose sum equal to k
@@ -586,4 +607,135 @@ func BinarySearchRecursive(nums []int, target, startIndex, endIndex int) int {
 		endIndex = mid - 1
 		return BinarySearchRecursive(nums, target, startIndex, endIndex)
 	}
+}
+
+/** Problem: 36. Valid Sudoku
+* Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+* Each row must contain the digits 1-9 without repetition.
+* Each column must contain the digits 1-9 without repetition.
+* Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+* Note:
+* A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+* Only the filled cells need to be validated according to the mentioned rules.
+ */
+
+func isValidSudoku(board [][]byte) bool {
+	return validSudoku(&board, 0, 0)
+}
+
+func validSudoku(board *[][]byte, rowStart int, colStart int) bool {
+	for row := rowStart; row < len(*board); row++ {
+		for col := colStart; col < len((*board)[0]); col++ {
+			if (*board)[row][col] == '.' {
+				continue
+			}
+			// fmt.Println("Values", (*board)[row][col], row, col)
+			if !isValid(board, row, col, (*board)[row][col]) {
+				return false
+			} else {
+				return validSudoku(board, row, col+1)
+			}
+		}
+		colStart = 0
+	}
+	return true
+}
+
+func isValid(board *[][]byte, row, col int, val byte) bool {
+	for i := 0; i < 9; i++ {
+
+		if (*board)[i][col] == val && i != row {
+			return false
+		}
+
+		if (*board)[row][i] == val && i != col {
+			return false
+		}
+
+		iRow := (3 * (row / 3)) + (i)/3
+		iCol := (3 * (col / 3)) + (i)%3
+
+		rowColStatus := iRow != row && iCol != col
+		if (*board)[iRow][iCol] == val && rowColStatus {
+			return false
+		}
+	}
+	return true
+}
+
+func rotateTheBox(box [][]string) [][]string {
+	// box := [][]byte{
+	// 	{'#','#','*','.','*','.'},
+	// 	{'#','#','#','*','.','.'},
+	// 	{'#','#','#','.','#','.'},
+	// }
+	ansBox := make([][]string, len(box[0]))
+	for row := 0; row < len(box); row++ {
+		for col := 0; col < len(box[0]); col++ {
+			if row == 0 {
+				ansBox[col] = make([]string, len(box))
+			}
+			// fmt.Println("Ans row and col", col, len(box)-1-row, box[row][col])
+			// ansBox[col][len(box)-1-row] = box[row][col]
+			// if box[row][col] == "*" {
+			// 	ansBox[col][len(box)-1-row] = box[row][col]
+			// 	// breakCol = col
+			// 	continue
+			// }
+			if box[row][col] == "." {
+				// fmt.Println("Row and Col", row, col)
+				for k := col; k >= 1; k-- {
+					if box[row][k-1] == "*" {
+						break
+					}
+					box[row][k], box[row][k-1] = box[row][k-1], box[row][k]
+					// ansBox[row][k], ansBox[row][k -1] = ansBox[row][k -1], ansBox[row][k]
+					// ansBox[col][len(box)-1-row] = box[row][k]
+				}
+
+			}
+		}
+	}
+
+	for row := 0; row < len(ansBox); row++ {
+		for col := 0; col < len(ansBox[0]); col++ {
+			ansBox[row][len(ansBox[0])-1-col] = box[col][row]
+		}
+	}
+
+	fmt.Println(box)
+	// fmt.Println(ansBox)
+
+	return ansBox
+}
+
+func rotateTheBoxs(box [][]byte) [][]byte {
+	// Get dimensions of the box
+	rows := len(box) //
+	cols := len(box[0])
+
+	// Create the rotated box with dimensions swapped
+	rotatedBox := make([][]byte, cols)
+	for col := range rotatedBox {
+		rotatedBox[col] = make([]byte, rows)
+	}
+
+	// Rotate the box
+	for row := 0; row < rows; row++ { // 0
+		emptyCol := cols - 1 // Track the empty column position //
+
+		// Move stones to the rightmost empty positions
+		for col := cols - 1; col >= 0; col-- {
+			rotatedBox[col][row] = '.'
+			if box[row][col] == '#' {
+				rotatedBox[emptyCol][rows-1-row] = '#'
+				emptyCol--
+			} else if box[row][col] == '*' {
+				emptyCol = col - 1                // Reset empty column position
+				rotatedBox[col][rows-1-row] = '*' // Place obstacle directly
+			}
+		}
+	}
+
+	return rotatedBox
 }
