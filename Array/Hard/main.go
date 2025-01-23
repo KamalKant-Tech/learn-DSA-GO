@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 )
 
 func main() {
 	// fmt.Println(superpalindromesInRange("40000000000000000", "50000000000000000"))
-	// s := "barfoofoobarthefoobarman"
-	// words := []string{"bar", "foo", "the"}
-	// fmt.Println(findSubstring(s, words))
+	s := "catsanddog"
+	words := []string{"cat", "cats", "and", "sand", "dog"}
+	fmt.Println(wordBreakUsingDP(s, words))
 }
 
 /*
@@ -348,4 +349,111 @@ func findSubstringOptimal(s string, words []string) []int {
 		}
 	}
 	return result
+}
+
+func wordBreakBruteForceUsingBacktracking(s string, wordDict []string) []string {
+	fmt.Println("Given Array: ", s, wordDict)
+	wordSet := make(map[string]bool)
+	for _, word := range wordDict {
+		wordSet[word] = true
+	}
+
+	result := []string{}
+
+	tmp := []string{}
+	wordBreakRecursive(s, wordSet, 0, &result, &tmp)
+	return result
+}
+
+func wordBreakRecursive(s string, wordDict map[string]bool, start int, result *[]string, tmp *[]string) {
+	if start == len(s) {
+		// If we reached the end, join the temporary results and add to final results
+		*result = append(*result, strings.Join(*tmp, " "))
+		return
+	}
+
+	for end := start + 1; end <= len(s); end++ {
+		word := s[start:end]
+		// Check if the current substring is a valid word
+		if wordDict[word] {
+			// Add the current word to the temporary result
+			*tmp = append(*tmp, s[start:end])
+			// Recur with the next part of the string
+			wordBreakRecursive(s, wordDict, end, result, tmp)
+			// Backtrack: remove the last word to explore other possibilities
+			*tmp = (*tmp)[:len(*tmp)-1]
+		}
+	}
+}
+
+func wordBreakUsingDP(s string, wordDict []string) []string {
+	fmt.Println("Given :", s, wordDict)
+	dp := map[int][]string{}
+	isExistWordExistMap := make(map[string]bool)
+	// fmt.Println(len(s))
+	for startIndex := len(s); startIndex >= 0; startIndex-- {
+		validSentences := []string{}
+		for endIndex := startIndex; endIndex < len(s); endIndex++ {
+			currentWord := s[startIndex : endIndex+1]
+			// fmt.Println(currentWord, dp, startIndex, endIndex+1)
+			// 9,10 g
+			// 8, 9 0
+			// 8, 10 og
+			// 7, 8 d
+			// 7, 9 do
+			// 7, 10 dog
+			// 6, 7 d
+			// 6, 8 dd
+			// 6, 9 ddo
+			// 6, 10 ddog
+
+			// 5, 6 n
+			// 5, 7 nd
+			// 5, 8 ndd
+			// 5, 9 nddo
+			// 5, 10 nddog
+
+			// 4, 5 a
+			// 5, 6 an
+			// 5, 7 and
+			if isExistWordExistMap[currentWord] {
+				continue
+			}
+			if isInWordDict(wordDict, currentWord) {
+				if endIndex == len(s)-1 {
+					// fmt.Println(" Inside:", endIndex, currentWord)
+					validSentences = append(validSentences, currentWord)
+				} else {
+					// If it's not the last word, append it to each sentence formed by the remaining substring
+					sentencesFromNextIndex, exists := dp[endIndex+1]
+					// fmt.Println("Inside Else: ", sentencesFromNextIndex, endIndex, validSentences)
+					if exists {
+						for _, sentence := range sentencesFromNextIndex {
+							// fmt.Println(currentWord, sentence, endIndex+1)
+							validSentences = append(validSentences, currentWord+" "+sentence)
+						}
+					}
+				}
+			} else {
+				isExistWordExistMap[currentWord] = true
+			}
+
+		}
+		fmt.Println("Valid Sentences:", isExistWordExistMap)
+		// Store the valid sentences in dp
+		dp[startIndex] = validSentences
+	}
+	// fmt.Println(dp)
+	// Return the sentences formed from the entire string
+	return dp[0]
+	// return []string{}
+}
+
+func isInWordDict(wordDict []string, s string) bool {
+	for _, v := range wordDict {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }

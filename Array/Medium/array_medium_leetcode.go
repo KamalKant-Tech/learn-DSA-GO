@@ -1952,6 +1952,72 @@ func wordBreakOptimal(s string, wordDict []string) bool {
 	dp[0] = true
 	for i := 1; i <= len(s); i++ {
 		for j := 0; j < i; j++ {
+			// dp[j] - true
+			// wordset["c"] - false
+			// i = 2, j = 0
+			// dp[0] - true
+			// wordset["ca"] - false
+			// dp[1] - true
+			// wordset["a"] - false
+
+			// i = 3, j =0
+			// dp[0] - true
+			// wordset["cat"] - true
+			// dp[3] = true
+
+			// i = 4, j =0
+			// dp[0] - true
+			// wordset["cats"] - true
+			// dp[4] = true
+
+			// i =5 , j = 0
+			// dp[0] - true
+			// wordset["catsa"] - false
+			// dp[1] - false
+			// wordset["atsa"] - false
+			// dp[2] - false
+			// wordset["tsa"] - false
+			// dp[3] - true
+			// wordset["sa"] - false
+			// dp[4] - true
+			// wordset["a"] - false
+
+			// i = 5, j= 0
+			// dp[0] - true
+			// wordset["catsan"] - false
+			// dp[1] - false
+			// wordset["atsan"] - false
+			// dp[2] - false
+			// wordset["tsan"] - false
+			// dp[3] - true
+			// wordset["san"] - false
+			// dp[4] - true
+			// wordset["an"] - false
+			// dp[5] - false
+			// wordset["n"] - false
+			// *
+			// *
+			// *
+			// *
+			// *
+			// i =10, j =0
+			// dp[0] - true
+			// wordset["catsanddog"] - false
+			// dp[1] - false
+			// wordset["atsanddog"] - false
+			// dp[2] - false
+			// wordset["tsanddog"] - false
+			// dp[3] - true
+			// wordset["sanddog"] - false
+			// dp[4] - true
+			// wordset["anddog"] - false
+			// dp[5] - false
+			// wordset["nddog"] - false
+			// dp[6] - false
+			// wordset["ddog"] - false
+			// dp[7] - true
+			// wordset["dog"] - true
+
 			if dp[j] && wordSet[s[j:i]] {
 				dp[i] = true
 				break
