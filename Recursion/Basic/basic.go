@@ -1,12 +1,33 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 	//str := "kamal"
-	nums := []int{3, 1, 2}
-	arr := []int{}
-	printSubsequences(0, nums, arr)
+	// nums := []int{3, 1, 2}
+	// arr := []int{}
+	// printSubsequences(0, nums, arr)
+	matrix := [][]int{
+		{1,2,3},
+		{3,1,2},
+		{2,3,1},
+	}
+	fmt.Println(checkValid(matrix))
+	// matrix := [][]int{
+	// 	{1,2,3},
+	// 	{4,5,6},
+	// 	{7,8,9},
+	// }
+	// fmt.Println(diagonalSumBetter(matrix))
+	// matrix := [][]int{
+	// 	{1,2,3,4},
+	// 	{5,6,7,8},
+	// 	{9,10,11,12},
+	// 	{13,14,15,16},
+	// }
+	// printMatrixSpiralOrder(matrix)
 }
 
 /**
@@ -151,4 +172,47 @@ func printSubsequences(i int, nums []int, arr []int) {
 	// Not pick the element into subsequences
 	arr = append([]int{}, arr[:len(arr)-1]...)
 	printSubsequences(i+1, nums, arr)
+}
+
+/**
+* Problem: 2133. Check if Every Row and Column Contains All Numbers
+* An n x n matrix is valid if every row and every column contains all the integers from 1 to n (inclusive).
+* Given an n x n integer matrix matrix, return true if the matrix is valid. Otherwise, return false.
+* Input: matrix = [[1,2,3],[3,1,2],[2,3,1]]
+* Output: true
+* Explanation: In this case, n = 3, and every row and column contains the numbers 1, 2, and 3. Hence, we return true.
+*/
+
+func checkValid(matrix [][]int) bool {
+	return isCheckValid(matrix, 0, 0)
+}
+
+func isCheckValid(matrix [][]int, irow int, icol int) bool {
+	mflatMatrix := []int{}
+	for row := irow; row < len(matrix); row++ {
+		for col := icol; col < len(matrix[0]); col++ {
+			// mflatMatrix = append(mflatMatrix, matrix[row][col])
+			if !isValidRowCol(matrix, row, col, matrix[row][col]) {
+				return false
+			} else {
+				return isCheckValid(matrix, row, col + 1)
+			}
+		}
+		icol = 0
+	}
+	fmt.Println(mflatMatrix)
+	return true
+}
+
+func isValidRowCol(matrix [][]int, row int, col int, val int) bool {
+	for i := 0; i < len(matrix); i++ {
+		if matrix[row][i] == val && i != col {
+			return false
+		}
+
+		if matrix[i][col] == val && i != row {
+			return false
+		}
+	}
+	return true
 }
