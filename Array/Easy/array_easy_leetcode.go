@@ -46,7 +46,9 @@ func main() {
 	// fmt.Println(dominantIndex([]int{1, 2, 3, 4}))
 	// superpalindromesInRange("4", "1000")
 
-	rotateString("abcde", "cdeab")
+	// rotateString("abcde", "cdeab")
+	// fmt.Println(countPalindromesOptimise("Abcmadamxyzmalayalampqr"))
+	fmt.Println(mergeTwoSortedArrayOwn([]int{1, 2, 3, 0, 0, 0}, 3, []int{2, 5, 6}, 3))
 }
 
 // Continuous Subarray Sum
@@ -1414,4 +1416,47 @@ func rotateString(s string, goal string) bool {
 		}
 	}
 	return false
+}
+
+// Count the number of pallindromes in a string
+// Abcmadamxyzmalayalampqr
+
+func countPalindromesOptimise(str string) int {
+	fmt.Println("Given String is :", str)
+	length := len(str)
+	count := 0
+
+	// Create a 2D array to store whether a substring is a palindrome
+	dp := make([][]bool, length)
+	for i := range dp {
+		dp[i] = make([]bool, length)
+		dp[i][i] = true // All individual characters are palindromes
+		//count++
+	}
+
+	// fmt.Println("The 2D array is : ", dp)
+
+	// Check palindromes for substrings of length 2 and above
+	for l := 2; l <= length; l++ {
+		for i := 0; i <= length-l; i++ {
+			j := i + l - 1
+
+			if l == 2 && str[i] == str[j] {
+				dp[i][j] = true
+				count++
+			} else if str[i] == str[j] && dp[i+1][j-1] {
+				dp[i][j] = true
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
+// Merge two sorted array
+
+func mergeTwoSortedArrayOwn(arr1 []int, m int, arr2 []int, n int) []int {
+	// TBD- Use gap analysis threorem to solve this problem
+	return []int{}
 }
