@@ -16,18 +16,20 @@ func main() {
 
 	// graph := [][]int{{0, 1, 1, 1}, {1, 0, 1, 0}, {1, 1, 0, 1}, {1, 0, 1, 0}}
 	// graphInput := [][]int{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {0, 2}}
-	graphInput := [][]int{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {0, 2}}
-	// create a graph len of four because the vertices are 4 which is 0 -> 3
-	graph := make([][]int, 4)
-	for i := range graph {
-		graph[i] = make([]int, 4)
-	}
-	for _, edge := range graphInput {
-		graph[edge[0]][edge[1]] = 1
-		graph[edge[1]][edge[0]] = 1
-	}
-	fmt.Println(graph)
-	fmt.Println(graphColoring(graph, 3))
+	// graphInput := [][]int{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {0, 2}}
+	// // create a graph len of four because the vertices are 4 which is 0 -> 3
+	// graph := make([][]int, 4)
+	// for i := range graph {
+	// 	graph[i] = make([]int, 4)
+	// }
+	// for _, edge := range graphInput {
+	// 	graph[edge[0]][edge[1]] = 1
+	// 	graph[edge[1]][edge[0]] = 1
+	// }
+	// fmt.Println(graph)
+	// fmt.Println(graphColoring(graph, 3))
+
+	fmt.Println(minCutOptimalUsingDp("abcdefghi"))
 }
 
 /*
@@ -528,4 +530,146 @@ func isSafe(graph [][]int, colors []int, i, color int) bool {
 		}
 	}
 	return true
+}
+
+// 132. Palindrome Partitioning II
+// Given a string s, partition s such that every substring of the partition is a palindrome Palindrome.
+// A palindrome is a string that reads the same forward and backward.
+// Return the minimum cuts needed for a palindrome partitioning of s.
+// Input: s = "aab"
+// Output: 1
+// Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cut.
+
+func minCutBruteForce(s string) int {
+	cuts := 0
+	minCutRecursive(s, 0, []string{}, &cuts)
+	// fmt.Println(result)
+	return cuts
+}
+
+func minCutRecursive(s string, index int, pallindromString []string, cuts *int) {
+	if index == len(s) {
+		if *cuts == 0 {
+			*cuts = len(pallindromString) - 1
+		}
+
+		if len(pallindromString)-1 < *cuts {
+			*cuts = len(pallindromString) - 1
+		}
+		return
+	}
+	for i := index; i < len(s); i++ {
+		if isPalindromeStr(s[index : i+1]) {
+			pallindromString = append(pallindromString, s[index:i+1])
+			minCutRecursive(s, i+1, pallindromString, cuts)
+			pallindromString = pallindromString[:len(pallindromString)-1]
+		}
+	}
+}
+
+func isPalindromeStr(s string) bool {
+	i := 0
+	j := len(s) - 1
+	if len(s) == 0 {
+		return false
+	}
+	for i < j {
+		if s[i] != s[j] {
+			return false
+		}
+		i++
+		j--
+	}
+	return true
+}
+
+func minCutBetterUsingDP(s string) int {
+	n := len(s)
+	if n == 0 {
+		return 0
+	}
+
+	// Create a 2D slice to store whether a substring is a palindrome
+	isPalindrome := make([][]bool, n)
+	for i := range isPalindrome {
+		isPalindrome[i] = make([]bool, n)
+	}
+
+	// Initialize the isPalindrome table
+	for i := 0; i < n; i++ {
+		isPalindrome[i][i] = true
+	}
+	for length := 2; length <= n; length++ {
+		for i := 0; i <= n-length; i++ {
+			j := i + length - 1
+			if length == 2 {
+				isPalindrome[i][j] = (s[i] == s[j])
+			} else {
+				isPalindrome[i][j] = (s[i] == s[j] && isPalindrome[i+1][j-1])
+			}
+		}
+	}
+
+	// Create a slice to store the minimum cuts needed for each prefix of the string
+	minCuts := make([]int, n)
+	for i := range minCuts {
+		if isPalindrome[0][i] {
+			minCuts[i] = 0
+		} else {
+			minCuts[i] = i
+			for j := 0; j < i; j++ {
+				if isPalindrome[j+1][i] {
+					minCuts[i] = min(minCuts[i], minCuts[j]+1)
+				}
+			}
+		}
+	}
+
+	return minCuts[n-1]
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func minCutOptimalUsingDp(s string) int {
+	n := len(s)
+	if n == 0 {
+		return 0
+	}
+
+	// Create a slice to store the minimum cuts needed for each prefix of the string
+	minCuts := make([]int, n)
+
+	// Initialize minCuts with the worst case: cutting between every character
+	for i := range minCuts {
+		minCuts[i] = i
+	}
+
+	// Helper function to expand around the center and check for palindromes
+	checkPalindrome := func(left, right int) {
+		for left >= 0 && right < n && s[left] == s[right] {
+			if left == 0 {
+				minCuts[right] = 0
+			} else {
+				minCuts[right] = min(minCuts[right], minCuts[left-1]+1)
+			}
+			left--
+			right++
+		}
+	}
+
+	// Iterate over each character as a potential center for odd and even palindromes
+	for i := 0; i < n; i++ {
+		// Check odd-length palindromes
+		checkPalindrome(i, i)
+
+		// Check even-length palindromes
+		checkPalindrome(i, i+1)
+	}
+	fmt.Println(minCuts)
+	return minCuts[n-1]
 }
