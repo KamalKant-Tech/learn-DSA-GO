@@ -4,5 +4,16 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"github.copilot.chat.edits.codesearch.enabled": true,
+		"github.copilot.chat.scopeSelection": false,
+		"github.copilot.chat.terminalChatLocation": "chatView",
+		"github.copilot.nextEditSuggestions.enabled": false
+	},
+	"extensions": {
+		"recommendations": [
+			"github.copilot-chat",
+			"github.copilot"
+		]
+	}
 }
