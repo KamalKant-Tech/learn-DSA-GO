@@ -29,9 +29,12 @@ func main() {
 	// fmt.Println(groupAnagramsUsingHashMap(strs))
 	// fmt.Println(checkTwoStringAnnagram("eat", "tea"))
 	// fmt.Println(sumSubarrayMins([]int{3, 1, 2, 4}))
-	s := "aaaaab"
-	wordDict := []string{"a", "aa", "aaa", "aaaa", "aaaaa"}
-	fmt.Println(wordBreak(s, wordDict))
+
+	// s := "aaaaab"
+	// wordDict := []string{"a", "aa", "aaa", "aaaa", "aaaaa"}
+	// fmt.Println(wordBreak(s, wordDict))
+
+	fmt.Println(partitionPalindrome("cbbbcc"))
 }
 
 /**
@@ -2075,3 +2078,49 @@ func wordBreakOptimal(s string, wordDict []string) bool {
 // 	return false
 
 // }
+
+/**
+* Problem: 131. Palindrome Partitioning
+* Given a string s, partition s such that every substring of the partition is a palindrome. Return all possible palindrome partitioning of s.
+* Example 1:
+* Input: s = "aab"
+* Output: [["a","a","b"],["aa","b"]]
+ */
+
+func partitionPalindrome(s string) [][]string {
+	result := make([][]string, 0)
+	pallindromePartitionHelper(s, 0, []string{}, &result)
+	return result
+}
+
+func pallindromePartitionHelper(s string, index int, pallindromString []string, res *[][]string) {
+	if index == len(s) {
+		temp := make([]string, 0)
+		// copy(temp, pallindromString)
+		temp = append(temp, pallindromString...)
+		*res = append(*res, temp)
+		fmt.Println(len(*res))
+		return
+	}
+	for i := index; i < len(s); i++ {
+		if isPalindrome(s[index : i+1]) {
+			pallindromString = append(pallindromString, s[index:i+1])
+			pallindromePartitionHelper(s, i+1, pallindromString, res)
+			pallindromString = pallindromString[:len(pallindromString)-1]
+			fmt.Println("Pallindrome herer: ", pallindromString, s[:index])
+		}
+	}
+}
+
+func isPalindrome(s string) bool {
+	i := 0
+	j := len(s) - 1
+	for i < j {
+		if s[i] != s[j] {
+			return false
+		}
+		i++
+		j--
+	}
+	return true
+}

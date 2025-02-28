@@ -1,0 +1,5 @@
+{
+    "github.copilot.chat.completionContext.typescript.mode": "on",
+    "github.copilot.chat.languageContext.typescript.enabled": false,
+    "github.copilot.editor.enableAutoCompletions": true
+}
