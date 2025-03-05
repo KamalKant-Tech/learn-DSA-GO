@@ -23,9 +23,14 @@ func main() {
 	// fmt.Println(NinjaTrainningTabulation(3, [][]int{{1, 2, 5}, {3, 1, 1}, {3, 3, 3}}))
 	// fmt.Println(NinjaTrainningTabulation(3, [][]int{{18, 11, 19}, {4, 13, 7}, {1, 8, 13}}))
 	// fmt.Println(NinjaTrainningTabulation(3, [][]int{{10, 40, 70}, {20, 50, 80}, {30, 60, 90}}))
-	fmt.Println(maxProfitUsingRecursion([]int{7, 1, 5, 3, 6, 4}))
-	fmt.Println(maxProfitUsingMemoization([]int{7, 1, 5, 3, 6, 4}))
-	fmt.Println(maxProfitUsingTabulation([]int{7, 1, 5, 3, 6, 4}))
+	// fmt.Println(maxProfitUsingRecursion([]int{7, 1, 5, 3, 6, 4}))
+	// fmt.Println(maxProfitUsingMemoization([]int{7, 1, 5, 3, 6, 4}))
+	// fmt.Println(maxProfitWithCooldown([]int{1, 2, 3, 0, 2}))
+	// fmt.Println(numSquaresRecursion(18))
+	// fmt.Println(numSquaresMemo(18))
+	// fmt.Println(numSquaresTabulation(18))
+	fmt.Println(totalUniquePathsMemo(2, 6))
+	fmt.Println(totalUniquePathsTabulation(2, 6))
 }
 
 // Problem: 2498. Frog Jump II
@@ -424,4 +429,252 @@ func NinjaTrainningTabulation(n int, points [][]int) int {
 		}
 	}
 	return dp[n-1][2]
+}
+
+// 309. Best Time to Buy and Sell Stock with Cooldown
+// You are given an array prices where prices[i] is the price of a given stock on the ith day.
+// Find the maximum profit you can achieve. You may complete as many transactions as you
+// like (i.e., buy one and sell one share of the stock multiple times) with the following restrictions:
+// After you sell your stock, you cannot buy stock on the next day (i.e., cooldown one day).
+// Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+// Input: prices = [1,2,3,0,2]
+// Output: 3
+// Explanation: transactions = [buy, sell, cooldown, buy, sell]
+
+// Need to revisit this below Logic
+func maxProfitWithCooldown(prices []int) int {
+	fmt.Println("Given array: ", prices)
+	memo := make(map[[2]int]int)
+	return maxProfitWithCooldownUsingRecusion(prices, 0, false, memo)
+}
+
+func maxProfitWithCooldownUsingRecusion(prices []int, day int, holding bool, memo map[[2]int]int) int {
+
+	// Base case: If we are out of days, profit is 0
+	if day >= len(prices) {
+		return 0
+	}
+
+	// Create a key for memoization
+	key := [2]int{day, boolToInt(holding)}
+	if val, exists := memo[key]; exists {
+		return val
+	}
+
+	// Recursive cases
+	var result int
+	if holding {
+		// Option 1: Sell the stock today
+		sell := prices[day] + maxProfitWithCooldownUsingRecusion(prices, day+2, false, memo) // Cooldown for next day
+		// Option 2: Do nothing
+		hold := maxProfitWithCooldownUsingRecusion(prices, day+1, true, memo)
+		result = max(sell, hold)
+	} else {
+		// Option 1: Buy the stock today
+		buy := -prices[day] + maxProfitWithCooldownUsingRecusion(prices, day+1, true, memo)
+		// Option 2: Do nothing
+		skip := maxProfitWithCooldownUsingRecusion(prices, day+1, false, memo)
+		result = max(buy, skip)
+	}
+
+	// Store the result in the memoization map
+	memo[key] = result
+	return result
+}
+
+// Helper function to convert boolean to int
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+// Helper function to find the max of two integers
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// 279. Perfect Squares
+// Given an integer n, return the least number of perfect square numbers that sum to n.
+// A perfect square is an integer that is the square of an integer; in other words, it is the product of some integer with itself.
+// For example, 1, 4, 9, and 16 are perfect squares while 3 and 11 are not.
+
+// Greedy approach
+// func numSquaresHelper(n int, nCount, count int, counter int) int {
+// 	if n == 0 {
+// 		return 0
+// 	}
+// 	maxCount := count
+// 	for i := counter; i <= nCount; i++ {
+// 		iSquare := i * i
+
+// 		// if iSquare <= n {
+// 		// 	maxCount++
+// 		// 	fmt.Println(iSquare, n, nCount, i, maxCount)
+// 		// 	return int(math.Max(float64(maxCount), float64(numSquaresHelper(n-iSquare, nCount, maxCount, counter))))
+// 		// }
+
+// 		maxCount++
+// 		fmt.Println(iSquare, n, nCount, i, maxCount)
+// 		return int(math.Max(float64(maxCount), float64(numSquaresHelper(n-iSquare, nCount, maxCount, counter))))
+// 	}
+// 	return maxCount
+// }
+
+// Using Recursion
+func numSquaresRecursion(n int) int {
+	memo := make([]int, n+1)
+	return numSquaresHelperRecursion(n, memo)
+}
+
+// Using Recursion
+func numSquaresHelperRecursion(n int, memo []int) int {
+	if n < 4 {
+		return n
+	}
+
+	ans := n
+
+	for i := 1; i*i <= n; i++ {
+		square := i * i
+		ans = int(math.Min(float64(ans), float64(1+numSquaresHelperMemo(n-square, memo))))
+	}
+
+	return ans
+}
+
+// Using Memo
+func numSquaresMemo(n int) int {
+	memo := make([]int, n+1)
+	return numSquaresHelperMemo(n, memo)
+}
+
+// Using Memo
+func numSquaresHelperMemo(n int, memo []int) int {
+	if n < 4 {
+		return n
+	}
+
+	if memo[n] != 0 {
+		return memo[n]
+	}
+
+	ans := n
+
+	for i := 1; i*i <= n; i++ {
+		square := i * i
+		ans = int(math.Min(float64(ans), float64(1+numSquaresHelperMemo(n-square, memo))))
+	}
+
+	memo[n] = ans
+	return ans
+}
+
+func numSquaresTabulation(n int) int {
+	// Create a dp array to store the minimum number of perfect squares
+	dp := make([]int, n+1)
+
+	// Base case: 0 can be formed with 0 squares
+	dp[0] = 0
+
+	// Fill the dp array
+	for i := 1; i <= n; i++ {
+		dp[i] = math.MaxInt32 // Initialize with a large value
+		for j := 1; j*j <= i; j++ {
+			square := j * j
+			dp[i] = int(math.Min(float64(dp[i]), float64(1+dp[i-square])))
+		}
+	}
+	return dp[n]
+}
+
+// Problem: Total Unique Paths
+// Link: https://www.youtube.com/watch?v=sdE0A2Oxofw&list=PLgUwDviBIf0qUlt5H_kiKYaNSqJ81PMMY&index=11
+// You are present at point ‘A’ which is the top-left cell of an M X N matrix, your destination is point ‘B’,
+// which is the bottom-right cell of the same matrix. Your task is to find the total number of unique paths
+// from point ‘A’ to point ‘B’.In other words, you will be given the dimensions of the matrix as integers ‘M’ and ‘N’,
+// your task is to find the total number of unique paths from the cell MATRIX[0][0] to MATRIX['M' - 1]['N' - 1].
+
+// To traverse in the matrix, you can either move Right or Down at each step.
+// For example in a given point MATRIX[i] [j], you can move to either MATRIX[i + 1][j] or MATRIX[i][j + 1].
+// TC: 2^m*n, SC: O((m-1) + (n-1))
+func totalUniquePaths(m, n int) int {
+
+	return totalUniquePathsHelper(m-1, n-1)
+}
+
+func totalUniquePathsHelper(row, col int) int {
+	// base case if we reach to target
+	if row == 0 && col == 0 {
+		return 1
+	}
+	// if row and col exceeding the boundary means if less than 0 then return 0
+	if row < 0 || col < 0 {
+		return 0
+	}
+
+	// Since we can move to right and bottom, In this recursion will have to go just reverse i.e up and left cause we started with m and n
+	up := totalUniquePathsHelper(row-1, col)   // row will reduce cause going up
+	left := totalUniquePathsHelper(row, col-1) // col will reduce cause going left
+
+	return up + left
+}
+
+// Using Momoization
+// TC: O(m*n), SC: O((m-1) + (n-1)) + O(n * m)
+func totalUniquePathsMemo(m, n int) int {
+	dp := make([][]int, m)
+	for i := 0; i < m; i++ {
+		dp[i] = make([]int, n)
+		for j := 0; j < n; j++ {
+			dp[i][j] = -1
+		}
+	}
+	fmt.Println("Dp Array: ", dp)
+	return totalUniquePathsMemoHelper(m-1, n-1, dp)
+}
+
+func totalUniquePathsMemoHelper(row, col int, dp [][]int) int {
+	// base case if we reach to target
+	if row == 0 && col == 0 {
+		return 1
+	}
+	// if row and col exceeding the boundary means if less than 0 then return 0
+	if row < 0 || col < 0 {
+		return 0
+	}
+
+	if dp[row][col] != -1 {
+		return dp[row][col]
+	}
+	// Since we can move to right and bottom, In this recursion will have to go just reverse i.e up and left cause we started with m and n
+	up := totalUniquePathsMemoHelper(row-1, col, dp)   // row will reduce cause going up
+	left := totalUniquePathsMemoHelper(row, col-1, dp) // col will reduce cause going left
+
+	dp[row][col] = up + left
+	return dp[row][col]
+}
+
+// Using Tabulation
+// TC: O(m*n), SC: O((m-1) + (n-1)) + O(n * m)
+func totalUniquePathsTabulation(m, n int) int {
+	dp := make([][]int, m)
+	for i := 0; i < m; i++ {
+		dp[i] = make([]int, n)
+	}
+	dp[0][0] = 1
+	fmt.Println("Dp Array: ", dp)
+	for row := 0; row < m; row++ {
+		for col := 0; col < n; col++ {
+			if row-1 < 0 || col-1 < 0 {
+				continue
+			}
+			dp[row][col] = dp[row-1][col] + dp[row][col-1]
+		}
+	}
+	return dp[m-1][n-1]
 }
