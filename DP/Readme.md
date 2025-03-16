@@ -38,3 +38,11 @@
 - Do all possible stuff/operation to that index according to the problem statement.
 - Sum of all stuffs -> count all ways
 - Minimum of stuffs -> find Min
+
+### Shortcut Tricks to apply 2 DP any solution
+-  Count Paths
+- Count Paths with Obstacles 
+- Min Path Sum
+- Max Path Sum
+- Triangle Problem
+- 2 Start Points
