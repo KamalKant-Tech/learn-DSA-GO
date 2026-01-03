@@ -29,9 +29,12 @@ func main() {
 	// fmt.Println(numSquaresRecursion(18))
 	// fmt.Println(numSquaresMemo(18))
 	// fmt.Println(numSquaresTabulation(18))
-	fmt.Println(totalUniquePathsMemo(2, 6))
-	fmt.Println(totalUniquePathsTabulation(2, 6))
-	fmt.Println(totalUniquePathsSpaceOptimization(2, 6))
+	// fmt.Println(totalUniquePathsMemo(2, 6))
+	// fmt.Println(totalUniquePathsTabulation(2, 6))
+	// fmt.Println(totalUniquePathsSpaceOptimization(2, 6))
+	// fmt.Println(mincostTickets([]int{1, 4, 6, 7, 8, 20}, []int{2, 7, 15}))
+	// fmt.Println(mincostTicketsRecursions([]int{1, 4, 6, 7, 8, 20}, []int{2, 7, 15}))
+	fmt.Println(maxSumAfterPartitioning([]int{1, 15, 7, 9, 2, 5, 10}, 3))
 }
 
 // Problem: 2498. Frog Jump II
@@ -715,4 +718,164 @@ func totalUniquePathsSpaceOptimization(m, n int) int {
 		prevRow = currentRow
 	}
 	return prevRow[n-1]
+}
+
+// Problem: 983. Minimum Cost For Tickets
+// You have planned some train traveling one year in advance. The days of the year in which you will travel are given as an integer array days. Each day is an integer from 1 to 365.
+// Train tickets are sold in three different ways:
+// a 1-day pass is sold for costs[0] dollars,
+// a 7-day pass is sold for costs[1] dollars, and
+// a 30-day pass is sold for costs[2] dollars.
+
+// The passes allow that many days of consecutive travel.
+
+// For example, if we get a 7-day pass on day 2, then we can travel for 7 days: 2, 3, 4, 5, 6, 7, and 8.
+// Return the minimum number of dollars you need to travel every day in the given list of days.
+
+// Input: days = [1,4,6,7,8,20], costs = [2,7,15]
+// Output: 11
+// Explanation: For example, here is one way to buy passes that lets you travel your travel plan:
+// On day 1, you bought a 1-day pass for costs[0] = $2, which covered day 1.
+// On day 3, you bought a 7-day pass for costs[1] = $7, which covered days 3, 4, ..., 9.
+// On day 20, you bought a 1-day pass for costs[0] = $2, which covered day 20.
+// In total, you spent $11 and covered all the days of your travel.
+
+// func mincostTickets(days []int, costs []int) int {
+// 	return minCostTicketsHelper(days, costs, len(days)-1, 0)
+// }
+
+// func minCostTicketsHelper(days, cost []int, index int, costIndex int) int {
+// 	if index == 0 {
+// 		return cost[costIndex]
+// 	}
+
+// 	if index >= len(days) {
+// 		return 0
+// 	}
+// 	minCost := 0
+// 	for c := 0; c < len(cost); c++ {
+// 		for i := 0; i < index; i++ {
+// 			fmt.Printf("Cost %d, Index %d cost %d \n", c, i, minCost)
+// 			if i > 0 && days[i] > cost[c] {
+// 				minCost += minCostTicketsHelper(days, cost, index-1, c)
+// 			}
+// 			// if days[i] < cost[c] {
+// 			// 	fmt.Printf("Cost %d, Index %d cost %d \n", c, i, cost[c])
+// 			// 	return cost[c] + minCostTicketsHelper(days, cost, i-1, c+1)
+// 			// }
+// 		}
+// 	}
+
+// 	return minCost
+// }
+
+func mincostTicketsRecursions(days []int, costs []int) int {
+	fmt.Println("Given Array: ", days, costs)
+	// Create a set for quick lookup of travel days
+	travelDays := make(map[int]bool)
+	for _, day := range days {
+		travelDays[day] = true
+	}
+
+	// Memoization map
+	memo := make(map[int]int)
+
+	return MinCostTicketsHelper(days, costs, 1, memo, travelDays)
+}
+
+func MinCostTicketsHelper(days, costs []int, day int, memo map[int]int, travelDays map[int]bool) int {
+	// Base case: If day exceeds the last travel day, cost is 0
+	if day > days[len(days)-1] {
+		return 0
+	}
+
+	// Check memoized results
+	if val, exists := memo[day]; exists {
+		return val
+	}
+
+	// If this day is not a travel day, move to the next day
+	if !travelDays[day] {
+		memo[day] = MinCostTicketsHelper(days, costs, day+1, memo, travelDays)
+		return memo[day]
+	}
+
+	// Calculate the cost for 1-day, 7-day, and 30-day passes
+	cost1 := MinCostTicketsHelper(days, costs, day+1, memo, travelDays) + costs[0]
+	cost7 := MinCostTicketsHelper(days, costs, day+7, memo, travelDays) + costs[1]
+	cost30 := MinCostTicketsHelper(days, costs, day+30, memo, travelDays) + costs[2]
+
+	// Take the minimum of all options
+	memo[day] = min(cost1, min(cost7, cost30))
+	fmt.Println("Memo: ", memo)
+	return memo[day]
+}
+
+// Helper function to calculate the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func mincostTickets(days []int, costs []int) int {
+	// Create a set for quick lookup of travel days
+	travelDays := make(map[int]bool)
+	for _, day := range days {
+		travelDays[day] = true
+	}
+
+	maxDay := days[len(days)-1] // Last travel day
+	dp := make([]int, maxDay+1)
+
+	// Fill the DP table
+	for day := 1; day <= maxDay; day++ {
+		if !travelDays[day] {
+			// No travel needed, cost remains the same as the previous day
+			dp[day] = dp[day-1]
+		} else {
+			// Calculate the cost for 1-day, 7-day, and 30-day passes
+			cost1 := dp[day-1] + costs[0]
+			cost7 := dp[int(math.Max(float64(0), float64(day-7)))] + costs[1]
+			cost30 := dp[int(math.Max(float64(0), float64(day-30)))] + costs[2]
+			// Take the minimum of all options
+			dp[day] = int(math.Min(float64(cost1), math.Min(float64(cost7), float64(cost30))))
+		}
+	}
+
+	return dp[maxDay]
+}
+
+// Problem: 1043. Partition Array for Maximum Sum
+// Link: https://leetcode.com/problems/partition-array-for-maximum-sum/
+// Given an integer array arr, partition the array into (contiguous) subarrays of length at most k.
+// After partitioning, each subarray has their values changed to become the maximum value of that subarray.
+// Return the largest sum of the given array after partitioning. Test cases are generated so that the
+// answer fits in a 32-bit integer.
+// Example 1:
+
+// Input: arr = [1,15,7,9,2,5,10], k = 3
+// Output: 84
+// Explanation: arr becomes [15,15,15,9,10,10,10]
+// using Recursion
+func maxSumAfterPartitioning(arr []int, k int) int {
+	fmt.Println("Given Array: ", arr, k)
+	return maxSumAfterPartitioningRecursion(arr, k, 0)
+}
+
+func maxSumAfterPartitioningRecursion(arr []int, k, index int) int {
+
+	if index > len(arr)-1 {
+		return 0
+	}
+	maxSum := 0
+	for i := 1; i <= k; i++ {
+		if index+i-1 < len(arr) {
+			maxSum = int(math.Max(float64(maxSum), math.Max(float64(maxSumAfterPartitioningRecursion(arr, k, index+i)), float64(arr[index]))))
+			// maxSum = int(math.Max(float64(maxSum), float64(maxSumAfterPartitioningRecursion(arr, k, index+i)+arr[index])))
+		}
+	}
+	fmt.Println("Index: ", index, maxSum)
+	return maxSum
 }

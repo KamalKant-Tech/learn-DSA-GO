@@ -26,10 +26,10 @@ func main() {
 	// fmt.Println(MaxSumNonAdjacentPickNoPickMemo([]int{2, 1, 4, 9}))
 	// fmt.Println(MaxSumNonAdjacentPickNoPickTabulation([]int{2, 1, 4, 9}))
 	// fmt.Println(MaxSumNonAdjacentTabulationSpaceOptimize([]int{2, 1, 4, 9}))
-	fmt.Println(minCostClimbingStairs([]int{1, 100, 1, 1, 1, 100, 1, 1, 100, 1}))
-	fmt.Println(minCostClimbingStairsUsingMemo([]int{1, 100, 1, 1, 1, 100, 1, 1, 100, 1}))
-	fmt.Println(minCostClimbingStairsTabulation([]int{10, 15, 20}))
-	fmt.Println(minCostClimbingStairsUsingSpaceOptimization([]int{10, 15, 20}))
+	// fmt.Println(minCostClimbingStairs([]int{1, 100, 1, 1, 1, 100, 1, 1, 100, 1}))
+	// fmt.Println(minCostClimbingStairsUsingMemo([]int{1, 100, 1, 1, 1, 100, 1, 1, 100, 1}))
+	// fmt.Println(minCostClimbingStairsTabulation([]int{10, 15, 20}))
+	// fmt.Println(minCostClimbingStairsUsingSpaceOptimization([]int{10, 15, 20}))
 	//fmt.Println(dp, len(dp))
 }
 
