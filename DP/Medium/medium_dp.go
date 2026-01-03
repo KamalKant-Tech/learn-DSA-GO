@@ -23,9 +23,18 @@ func main() {
 	// fmt.Println(NinjaTrainningTabulation(3, [][]int{{1, 2, 5}, {3, 1, 1}, {3, 3, 3}}))
 	// fmt.Println(NinjaTrainningTabulation(3, [][]int{{18, 11, 19}, {4, 13, 7}, {1, 8, 13}}))
 	// fmt.Println(NinjaTrainningTabulation(3, [][]int{{10, 40, 70}, {20, 50, 80}, {30, 60, 90}}))
-	fmt.Println(maxProfitUsingRecursion([]int{7, 1, 5, 3, 6, 4}))
-	fmt.Println(maxProfitUsingMemoization([]int{7, 1, 5, 3, 6, 4}))
-	fmt.Println(maxProfitUsingTabulation([]int{7, 1, 5, 3, 6, 4}))
+	// fmt.Println(maxProfitUsingRecursion([]int{7, 1, 5, 3, 6, 4}))
+	// fmt.Println(maxProfitUsingMemoization([]int{7, 1, 5, 3, 6, 4}))
+	// fmt.Println(maxProfitWithCooldown([]int{1, 2, 3, 0, 2}))
+	// fmt.Println(numSquaresRecursion(18))
+	// fmt.Println(numSquaresMemo(18))
+	// fmt.Println(numSquaresTabulation(18))
+	// fmt.Println(totalUniquePathsMemo(2, 6))
+	// fmt.Println(totalUniquePathsTabulation(2, 6))
+	// fmt.Println(totalUniquePathsSpaceOptimization(2, 6))
+	// fmt.Println(mincostTickets([]int{1, 4, 6, 7, 8, 20}, []int{2, 7, 15}))
+	// fmt.Println(mincostTicketsRecursions([]int{1, 4, 6, 7, 8, 20}, []int{2, 7, 15}))
+	fmt.Println(maxSumAfterPartitioning([]int{1, 15, 7, 9, 2, 5, 10}, 3))
 }
 
 // Problem: 2498. Frog Jump II
@@ -424,4 +433,449 @@ func NinjaTrainningTabulation(n int, points [][]int) int {
 		}
 	}
 	return dp[n-1][2]
+}
+
+// 309. Best Time to Buy and Sell Stock with Cooldown
+// You are given an array prices where prices[i] is the price of a given stock on the ith day.
+// Find the maximum profit you can achieve. You may complete as many transactions as you
+// like (i.e., buy one and sell one share of the stock multiple times) with the following restrictions:
+// After you sell your stock, you cannot buy stock on the next day (i.e., cooldown one day).
+// Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+// Input: prices = [1,2,3,0,2]
+// Output: 3
+// Explanation: transactions = [buy, sell, cooldown, buy, sell]
+
+// Need to revisit this below Logic
+func maxProfitWithCooldown(prices []int) int {
+	fmt.Println("Given array: ", prices)
+	memo := make(map[[2]int]int)
+	return maxProfitWithCooldownUsingRecusion(prices, 0, false, memo)
+}
+
+func maxProfitWithCooldownUsingRecusion(prices []int, day int, holding bool, memo map[[2]int]int) int {
+
+	// Base case: If we are out of days, profit is 0
+	if day >= len(prices) {
+		return 0
+	}
+
+	// Create a key for memoization
+	key := [2]int{day, boolToInt(holding)}
+	if val, exists := memo[key]; exists {
+		return val
+	}
+
+	// Recursive cases
+	var result int
+	if holding {
+		// Option 1: Sell the stock today
+		sell := prices[day] + maxProfitWithCooldownUsingRecusion(prices, day+2, false, memo) // Cooldown for next day
+		// Option 2: Do nothing
+		hold := maxProfitWithCooldownUsingRecusion(prices, day+1, true, memo)
+		result = max(sell, hold)
+	} else {
+		// Option 1: Buy the stock today
+		buy := -prices[day] + maxProfitWithCooldownUsingRecusion(prices, day+1, true, memo)
+		// Option 2: Do nothing
+		skip := maxProfitWithCooldownUsingRecusion(prices, day+1, false, memo)
+		result = max(buy, skip)
+	}
+
+	// Store the result in the memoization map
+	memo[key] = result
+	return result
+}
+
+// Helper function to convert boolean to int
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+// Helper function to find the max of two integers
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// 279. Perfect Squares
+// Given an integer n, return the least number of perfect square numbers that sum to n.
+// A perfect square is an integer that is the square of an integer; in other words, it is the product of some integer with itself.
+// For example, 1, 4, 9, and 16 are perfect squares while 3 and 11 are not.
+
+// Greedy approach
+// func numSquaresHelper(n int, nCount, count int, counter int) int {
+// 	if n == 0 {
+// 		return 0
+// 	}
+// 	maxCount := count
+// 	for i := counter; i <= nCount; i++ {
+// 		iSquare := i * i
+
+// 		// if iSquare <= n {
+// 		// 	maxCount++
+// 		// 	fmt.Println(iSquare, n, nCount, i, maxCount)
+// 		// 	return int(math.Max(float64(maxCount), float64(numSquaresHelper(n-iSquare, nCount, maxCount, counter))))
+// 		// }
+
+// 		maxCount++
+// 		fmt.Println(iSquare, n, nCount, i, maxCount)
+// 		return int(math.Max(float64(maxCount), float64(numSquaresHelper(n-iSquare, nCount, maxCount, counter))))
+// 	}
+// 	return maxCount
+// }
+
+// Using Recursion
+func numSquaresRecursion(n int) int {
+	memo := make([]int, n+1)
+	return numSquaresHelperRecursion(n, memo)
+}
+
+// Using Recursion
+func numSquaresHelperRecursion(n int, memo []int) int {
+	if n < 4 {
+		return n
+	}
+
+	ans := n
+
+	for i := 1; i*i <= n; i++ {
+		square := i * i
+		ans = int(math.Min(float64(ans), float64(1+numSquaresHelperMemo(n-square, memo))))
+	}
+
+	return ans
+}
+
+// Using Memo
+func numSquaresMemo(n int) int {
+	memo := make([]int, n+1)
+	return numSquaresHelperMemo(n, memo)
+}
+
+// Using Memo
+func numSquaresHelperMemo(n int, memo []int) int {
+	if n < 4 {
+		return n
+	}
+
+	if memo[n] != 0 {
+		return memo[n]
+	}
+
+	ans := n
+
+	for i := 1; i*i <= n; i++ {
+		square := i * i
+		ans = int(math.Min(float64(ans), float64(1+numSquaresHelperMemo(n-square, memo))))
+	}
+
+	memo[n] = ans
+	return ans
+}
+
+func numSquaresTabulation(n int) int {
+	// Create a dp array to store the minimum number of perfect squares
+	dp := make([]int, n+1)
+
+	// Base case: 0 can be formed with 0 squares
+	dp[0] = 0
+
+	// Fill the dp array
+	for i := 1; i <= n; i++ {
+		dp[i] = math.MaxInt32 // Initialize with a large value
+		for j := 1; j*j <= i; j++ {
+			square := j * j
+			dp[i] = int(math.Min(float64(dp[i]), float64(1+dp[i-square])))
+		}
+	}
+	return dp[n]
+}
+
+// Problem: Total Unique Paths
+// Link: https://www.youtube.com/watch?v=sdE0A2Oxofw&list=PLgUwDviBIf0qUlt5H_kiKYaNSqJ81PMMY&index=11
+// You are present at point ‘A’ which is the top-left cell of an M X N matrix, your destination is point ‘B’,
+// which is the bottom-right cell of the same matrix. Your task is to find the total number of unique paths
+// from point ‘A’ to point ‘B’.In other words, you will be given the dimensions of the matrix as integers ‘M’ and ‘N’,
+// your task is to find the total number of unique paths from the cell MATRIX[0][0] to MATRIX['M' - 1]['N' - 1].
+
+// To traverse in the matrix, you can either move Right or Down at each step.
+// For example in a given point MATRIX[i] [j], you can move to either MATRIX[i + 1][j] or MATRIX[i][j + 1].
+// TC: 2^m*n, SC: O((m-1) + (n-1))
+func totalUniquePaths(m, n int) int {
+
+	return totalUniquePathsHelper(m-1, n-1)
+}
+
+func totalUniquePathsHelper(row, col int) int {
+	// base case if we reach to target
+	if row == 0 && col == 0 {
+		return 1
+	}
+	// if row and col exceeding the boundary means if less than 0 then return 0
+	if row < 0 || col < 0 {
+		return 0
+	}
+
+	// Since we can move to right and bottom, In this recursion will have to go just reverse i.e up and left cause we started with m and n
+	up := totalUniquePathsHelper(row-1, col)   // row will reduce cause going up
+	left := totalUniquePathsHelper(row, col-1) // col will reduce cause going left
+
+	return up + left
+}
+
+// Using Momoization
+// TC: O(m*n), SC: O((m-1) + (n-1)) + O(n * m)
+func totalUniquePathsMemo(m, n int) int {
+	dp := make([][]int, m)
+	for i := 0; i < m; i++ {
+		dp[i] = make([]int, n)
+		for j := 0; j < n; j++ {
+			dp[i][j] = -1
+		}
+	}
+	fmt.Println("Dp Array: ", dp)
+	return totalUniquePathsMemoHelper(m-1, n-1, dp)
+}
+
+func totalUniquePathsMemoHelper(row, col int, dp [][]int) int {
+	// base case if we reach to target
+	if row == 0 && col == 0 {
+		return 1
+	}
+	// if row and col exceeding the boundary means if less than 0 then return 0
+	if row < 0 || col < 0 {
+		return 0
+	}
+
+	if dp[row][col] != -1 {
+		return dp[row][col]
+	}
+	// Since we can move to right and bottom, In this recursion will have to go just reverse i.e up and left cause we started with m and n
+	up := totalUniquePathsMemoHelper(row-1, col, dp)   // row will reduce cause going up
+	left := totalUniquePathsMemoHelper(row, col-1, dp) // col will reduce cause going left
+
+	dp[row][col] = up + left
+	return dp[row][col]
+}
+
+// Using Tabulation
+// TC: O(m*n), SC: O(n * m)
+func totalUniquePathsTabulation(m, n int) int {
+	dp := make([][]int, m)
+	for i := 0; i < m; i++ {
+		dp[i] = make([]int, n)
+	}
+	dp[0][0] = 1
+	for row := 0; row < m; row++ {
+		for col := 0; col < n; col++ {
+			up := 0
+			left := 0
+			if row == 0 && col == 0 {
+				continue
+			} else {
+				if row > 0 {
+					up = dp[row-1][col]
+				}
+
+				if col > 0 {
+					left = dp[row][col-1]
+				}
+				dp[row][col] = up + left
+			}
+		}
+	}
+	return dp[m-1][n-1]
+}
+
+// Using Space Optimization
+// TC: O(m*n), SC: O(n)
+func totalUniquePathsSpaceOptimization(m, n int) int {
+	prevRow := make([]int, n) // take one dummy row for to refer the the up values
+	for row := 0; row < m; row++ {
+		currentRow := make([]int, n) // Take one more dummy array to keep track of current row calculation and store it.
+		for col := 0; col < n; col++ {
+			up := 0
+			left := 0
+			if row == 0 && col == 0 {
+				currentRow[0] = 1
+				continue
+			} else {
+				if row > 0 {
+					up = prevRow[col]
+				}
+
+				if col > 0 {
+					left = currentRow[col-1]
+				}
+				currentRow[col] = up + left
+			}
+		}
+		prevRow = currentRow
+	}
+	return prevRow[n-1]
+}
+
+// Problem: 983. Minimum Cost For Tickets
+// You have planned some train traveling one year in advance. The days of the year in which you will travel are given as an integer array days. Each day is an integer from 1 to 365.
+// Train tickets are sold in three different ways:
+// a 1-day pass is sold for costs[0] dollars,
+// a 7-day pass is sold for costs[1] dollars, and
+// a 30-day pass is sold for costs[2] dollars.
+
+// The passes allow that many days of consecutive travel.
+
+// For example, if we get a 7-day pass on day 2, then we can travel for 7 days: 2, 3, 4, 5, 6, 7, and 8.
+// Return the minimum number of dollars you need to travel every day in the given list of days.
+
+// Input: days = [1,4,6,7,8,20], costs = [2,7,15]
+// Output: 11
+// Explanation: For example, here is one way to buy passes that lets you travel your travel plan:
+// On day 1, you bought a 1-day pass for costs[0] = $2, which covered day 1.
+// On day 3, you bought a 7-day pass for costs[1] = $7, which covered days 3, 4, ..., 9.
+// On day 20, you bought a 1-day pass for costs[0] = $2, which covered day 20.
+// In total, you spent $11 and covered all the days of your travel.
+
+// func mincostTickets(days []int, costs []int) int {
+// 	return minCostTicketsHelper(days, costs, len(days)-1, 0)
+// }
+
+// func minCostTicketsHelper(days, cost []int, index int, costIndex int) int {
+// 	if index == 0 {
+// 		return cost[costIndex]
+// 	}
+
+// 	if index >= len(days) {
+// 		return 0
+// 	}
+// 	minCost := 0
+// 	for c := 0; c < len(cost); c++ {
+// 		for i := 0; i < index; i++ {
+// 			fmt.Printf("Cost %d, Index %d cost %d \n", c, i, minCost)
+// 			if i > 0 && days[i] > cost[c] {
+// 				minCost += minCostTicketsHelper(days, cost, index-1, c)
+// 			}
+// 			// if days[i] < cost[c] {
+// 			// 	fmt.Printf("Cost %d, Index %d cost %d \n", c, i, cost[c])
+// 			// 	return cost[c] + minCostTicketsHelper(days, cost, i-1, c+1)
+// 			// }
+// 		}
+// 	}
+
+// 	return minCost
+// }
+
+func mincostTicketsRecursions(days []int, costs []int) int {
+	fmt.Println("Given Array: ", days, costs)
+	// Create a set for quick lookup of travel days
+	travelDays := make(map[int]bool)
+	for _, day := range days {
+		travelDays[day] = true
+	}
+
+	// Memoization map
+	memo := make(map[int]int)
+
+	return MinCostTicketsHelper(days, costs, 1, memo, travelDays)
+}
+
+func MinCostTicketsHelper(days, costs []int, day int, memo map[int]int, travelDays map[int]bool) int {
+	// Base case: If day exceeds the last travel day, cost is 0
+	if day > days[len(days)-1] {
+		return 0
+	}
+
+	// Check memoized results
+	if val, exists := memo[day]; exists {
+		return val
+	}
+
+	// If this day is not a travel day, move to the next day
+	if !travelDays[day] {
+		memo[day] = MinCostTicketsHelper(days, costs, day+1, memo, travelDays)
+		return memo[day]
+	}
+
+	// Calculate the cost for 1-day, 7-day, and 30-day passes
+	cost1 := MinCostTicketsHelper(days, costs, day+1, memo, travelDays) + costs[0]
+	cost7 := MinCostTicketsHelper(days, costs, day+7, memo, travelDays) + costs[1]
+	cost30 := MinCostTicketsHelper(days, costs, day+30, memo, travelDays) + costs[2]
+
+	// Take the minimum of all options
+	memo[day] = min(cost1, min(cost7, cost30))
+	fmt.Println("Memo: ", memo)
+	return memo[day]
+}
+
+// Helper function to calculate the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func mincostTickets(days []int, costs []int) int {
+	// Create a set for quick lookup of travel days
+	travelDays := make(map[int]bool)
+	for _, day := range days {
+		travelDays[day] = true
+	}
+
+	maxDay := days[len(days)-1] // Last travel day
+	dp := make([]int, maxDay+1)
+
+	// Fill the DP table
+	for day := 1; day <= maxDay; day++ {
+		if !travelDays[day] {
+			// No travel needed, cost remains the same as the previous day
+			dp[day] = dp[day-1]
+		} else {
+			// Calculate the cost for 1-day, 7-day, and 30-day passes
+			cost1 := dp[day-1] + costs[0]
+			cost7 := dp[int(math.Max(float64(0), float64(day-7)))] + costs[1]
+			cost30 := dp[int(math.Max(float64(0), float64(day-30)))] + costs[2]
+			// Take the minimum of all options
+			dp[day] = int(math.Min(float64(cost1), math.Min(float64(cost7), float64(cost30))))
+		}
+	}
+
+	return dp[maxDay]
+}
+
+// Problem: 1043. Partition Array for Maximum Sum
+// Link: https://leetcode.com/problems/partition-array-for-maximum-sum/
+// Given an integer array arr, partition the array into (contiguous) subarrays of length at most k.
+// After partitioning, each subarray has their values changed to become the maximum value of that subarray.
+// Return the largest sum of the given array after partitioning. Test cases are generated so that the
+// answer fits in a 32-bit integer.
+// Example 1:
+
+// Input: arr = [1,15,7,9,2,5,10], k = 3
+// Output: 84
+// Explanation: arr becomes [15,15,15,9,10,10,10]
+// using Recursion
+func maxSumAfterPartitioning(arr []int, k int) int {
+	fmt.Println("Given Array: ", arr, k)
+	return maxSumAfterPartitioningRecursion(arr, k, 0)
+}
+
+func maxSumAfterPartitioningRecursion(arr []int, k, index int) int {
+
+	if index > len(arr)-1 {
+		return 0
+	}
+	maxSum := 0
+	for i := 1; i <= k; i++ {
+		if index+i-1 < len(arr) {
+			maxSum = int(math.Max(float64(maxSum), math.Max(float64(maxSumAfterPartitioningRecursion(arr, k, index+i)), float64(arr[index]))))
+			// maxSum = int(math.Max(float64(maxSum), float64(maxSumAfterPartitioningRecursion(arr, k, index+i)+arr[index])))
+		}
+	}
+	fmt.Println("Index: ", index, maxSum)
+	return maxSum
 }

@@ -19,13 +19,17 @@ func main() {
 	// fmt.Println(FrogJumpWithKJumpUsingTabulation(5, 3, []int{10, 30, 40, 50, 20}))
 	// fmt.Println(FrogJumpWithKJumpUsingTabulation(3, 1, []int{10, 20, 10}))
 	// fmt.Println(FrogJumpWithKJumpUsingTabulation(10, 4, []int{40, 10, 20, 70, 80, 10, 20, 70, 80, 60}))
-	fmt.Println(MaxSumOfNonAdjacentElements([]int{2, 1, 4, 9}))
-	fmt.Println(MaxSumOfNonAdjacentElementsMemo([]int{2, 1, 4, 9}))
-	fmt.Println(MaxSumOfNonAdjacentElementsTabulation([]int{2, 1, 4, 9}))
-	fmt.Println(MaxSumNonAdjacentPickNoPick([]int{2, 1, 4, 9}))
-	fmt.Println(MaxSumNonAdjacentPickNoPickMemo([]int{2, 1, 4, 9}))
-	fmt.Println(MaxSumNonAdjacentPickNoPickTabulation([]int{2, 1, 4, 9}))
-	fmt.Println(MaxSumNonAdjacentTabulationSpaceOptimize([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumOfNonAdjacentElements([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumOfNonAdjacentElementsMemo([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumOfNonAdjacentElementsTabulation([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumNonAdjacentPickNoPick([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumNonAdjacentPickNoPickMemo([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumNonAdjacentPickNoPickTabulation([]int{2, 1, 4, 9}))
+	// fmt.Println(MaxSumNonAdjacentTabulationSpaceOptimize([]int{2, 1, 4, 9}))
+	// fmt.Println(minCostClimbingStairs([]int{1, 100, 1, 1, 1, 100, 1, 1, 100, 1}))
+	// fmt.Println(minCostClimbingStairsUsingMemo([]int{1, 100, 1, 1, 1, 100, 1, 1, 100, 1}))
+	// fmt.Println(minCostClimbingStairsTabulation([]int{10, 15, 20}))
+	// fmt.Println(minCostClimbingStairsUsingSpaceOptimization([]int{10, 15, 20}))
 	//fmt.Println(dp, len(dp))
 }
 
@@ -476,4 +480,103 @@ func MaxSumNonAdjacentTabulationSpaceOptimize(nums []int) int {
 		prev1 = current
 	}
 	return prev1
+}
+
+// Problem: 746. Min Cost Climbing Stairs
+// You are given an integer array cost where cost[i] is the cost of ith step on a staircase.
+// Once you pay the cost, you can either climb one or two steps.
+// You can either start from the step with index 0, or the step with index 1.
+// Return the minimum cost to reach the top of the floor.
+// TC: O(n), SC: O(n) for recursion stack
+func minCostClimbingStairs(cost []int) int {
+	return int(math.Min(float64(minCostClimbingStairsHelper(cost, len(cost)-1)), float64(minCostClimbingStairsHelper(cost, len(cost)-2))))
+}
+
+func minCostClimbingStairsHelper(cost []int, index int) int {
+	if index < 0 {
+		return 0
+	}
+
+	if index == 0 {
+		return cost[index]
+	}
+
+	minCost := math.Min(float64(cost[index]+minCostClimbingStairsHelper(cost, index-1)), float64(cost[index]+minCostClimbingStairsHelper(cost, index-2)))
+	return int(minCost)
+}
+
+// Using Memoization
+// TC: O(n), SC:O(n) for dp array we reduced the stack space for recursion
+func minCostClimbingStairsUsingMemo(cost []int) int {
+	dp := make([]int, len(cost))
+	for i := range dp {
+		dp[i] = -1
+	}
+	return int(math.Min(float64(minCostClimbingStairsHelperMemo(cost, len(cost)-1, dp)), float64(minCostClimbingStairsHelperMemo(cost, len(cost)-2, dp))))
+}
+
+func minCostClimbingStairsHelperMemo(cost []int, index int, dp []int) int {
+	if index < 0 {
+		return 0
+	}
+
+	if index == 0 {
+		return cost[index]
+	}
+
+	if dp[index] != -1 {
+		return dp[index]
+	}
+
+	zeroThIndex := cost[index] + minCostClimbingStairsHelperMemo(cost, index-1, dp)
+	oneThIndex := cost[index] + minCostClimbingStairsHelperMemo(cost, index-2, dp)
+	minCost := math.Min(float64(zeroThIndex), float64(oneThIndex))
+	dp[index] = int(minCost)
+	return dp[index]
+}
+
+// Using Tabulation
+// TC:O(n), SC: O(n) for dp array
+func minCostClimbingStairsTabulation(cost []int) int {
+	n := len(cost)
+	if n == 0 {
+		return 0
+	}
+	if n == 1 {
+		return cost[0]
+	}
+
+	dp := make([]int, n)
+	dp[0] = cost[0]
+	dp[1] = cost[1]
+
+	for i := 2; i < n; i++ {
+		dp[i] = cost[i] + int(math.Min(float64(dp[i-1]), float64(dp[i-2])))
+	}
+
+	return int(math.Min(float64(dp[n-1]), float64(dp[n-2])))
+}
+
+// Using Tabulation
+// TC:O(n)
+func minCostClimbingStairsUsingSpaceOptimization(cost []int) int {
+	n := len(cost)
+	if n == 0 {
+		return 0
+	}
+	if n == 1 {
+		return cost[0]
+	}
+
+	zerothCost := cost[0]
+	oneThCost := cost[1]
+
+	for i := 2; i < n; i++ {
+		currentMinCost := cost[i] + int(math.Min(float64(oneThCost), float64(zerothCost)))
+		zerothCost = oneThCost
+		oneThCost = currentMinCost
+
+	}
+
+	return int(math.Min(float64(zerothCost), float64(oneThCost)))
 }

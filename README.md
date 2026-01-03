@@ -128,3 +128,10 @@ Learn data structure algorithms with go
 ### Hard: LeetCode Problems:
 - [Problem: 51. N-Queens](Recursion/Hard/hard.go#L23)
 - [Problem: 52. N-Queens II](Recursion/Hard/hard.go#L145)
+
+## DP
+
+### Easy : Leetcode Problems
+- [Problem: 746. Min Cost Climbing Stairs(BruteForce- Using Recurion)](DP/Easy/easy_dp.go#L490)
+- [Problem: 746. Min Cost Climbing Stairs(BruteForce- Using Memoization)](DP/Easy/easy_dp.go#L509)
+- [Problem: 746. Min Cost Climbing Stairs(BruteForce- Using Tabulation)](DP/Easy/easy_dp.go#L537)
